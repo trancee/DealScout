@@ -26,7 +26,6 @@ repo = "https://github.com/dnephin/pre-commit-golang"
 rev = "v0.5.1"
 hooks = [
     { id = "go-fmt" },
-    { id = "go-vet", args = ["./..."] },
     { id = "go-build" },
     { id = "go-imports" },
     { id = "go-mod-tidy" },
@@ -43,5 +42,6 @@ hooks = [
 [[repos]]
 repo = "local"
 hooks = [
+    { id = "go-vet", name = "go-vet", description = "Run go vet ./...", entry = "go vet ./...", language = "system", types = ["go"], pass_filenames = false },
     { id = "gitlint", name = "gitlint", description = "Lint commit message (conventional commits)", entry = "gitlint --staged --msg-filename", language = "system", stages = ["commit-msg"] },
 ]

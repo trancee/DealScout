@@ -100,6 +100,7 @@ func processShop(shop config.Shop, f *fetcher.Fetcher, conv *currency.Converter,
 				if shopClean != nil {
 					cleaned = shopClean(cleaned)
 				}
+				cleaned = cleaners.NormalizeName(cleaned)
 				if catFilter != nil && catFilter(cleaned) {
 					continue
 				}

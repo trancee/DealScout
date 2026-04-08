@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/trancee/DealScout/internal/config"
+	"github.com/trancee/DealScout/internal/pipeline"
 	"github.com/trancee/DealScout/internal/storage"
 )
 
@@ -28,7 +29,6 @@ func main() {
 	slog.Info("config loaded",
 		"shops", len(cfg.Shops),
 		"deal_rules", len(cfg.DealRules),
-		"filters", len(cfg.Filters),
 		"base_currency", cfg.Settings.BaseCurrency,
 	)
 
@@ -39,12 +39,11 @@ func main() {
 	}
 	defer func() { _ = db.Close() }()
 
-	slog.Info("database opened", "path", cfg.Settings.DatabasePath)
-
-	// Flags are parsed and available for future phases.
-	_ = seed
-	_ = dryRun
-	_ = shopFilter
+	pipeline.Run(cfg, db, pipeline.Options{
+		Seed:     *seed,
+		DryRun:   *dryRun,
+		ShopName: *shopFilter,
+	})
 }
 
 func initLogger(level, format string) {

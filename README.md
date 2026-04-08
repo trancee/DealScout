@@ -33,6 +33,7 @@ DealScout is designed to run via system cron. It is not a long-running daemon.
 
 - Go 1.22 or later
 - A Telegram Bot token and a supergroup channel with Forum Topics enabled
+- (Optional) `golangci-lint` for linting, `make` for build automation
 
 ## Setup
 
@@ -41,7 +42,13 @@ DealScout is designed to run via system cron. It is not a long-running daemon.
 ```bash
 git clone https://github.com/trancee/DealScout.git
 cd DealScout
-go build -o dealscout ./cmd/dealscout/
+make build
+```
+
+Or without Make:
+
+```bash
+go build -trimpath -ldflags '-s -w' -o dealscout ./cmd/dealscout/
 ```
 
 ### 2. Create config directory
@@ -202,10 +209,10 @@ export TELEGRAM_CHANNEL="-1001234567890"
 
 ```bash
 # Linux AMD64
-GOOS=linux GOARCH=amd64 go build -o dealscout-linux ./cmd/dealscout/
+GOOS=linux GOARCH=amd64 make build
 
 # Linux ARM64 (Raspberry Pi)
-GOOS=linux GOARCH=arm64 go build -o dealscout-arm64 ./cmd/dealscout/
+GOOS=linux GOARCH=arm64 make build
 ```
 
 ## Telegram notification format
@@ -246,20 +253,34 @@ DealScout/
 └── plans/                             # Implementation plans
 ```
 
-## Testing
+## Development
+
+### Make targets
+
+| Target | Description |
+|--------|-------------|
+| `make` | Run all checks and build (default) |
+| `make build` | Compile optimized binary (~10MB, stripped) |
+| `make test` | Run all tests with race detector |
+| `make lint` | Run `golangci-lint` |
+| `make vet` | Run `go vet` |
+| `make fmt` | Format all Go source files |
+| `make check` | vet + lint + test |
+| `make clean` | Remove the compiled binary |
+
+### Running tests directly
 
 ```bash
-# Run all tests
-go test ./...
-
-# Run with race detector
-go test -race ./...
-
-# Verbose output
-go test -v ./...
+go test ./...           # All tests
+go test -race ./...     # With race detector
+go test -v ./...        # Verbose output
 ```
 
 The test suite covers 53 test functions (83 including sub-cases) across all modules, using in-memory SQLite databases and `httptest` servers — no external services required.
+
+### CI
+
+GitHub Actions runs on every push to `main` and on pull requests. The pipeline runs lint, test (with race detector and coverage), and build. See [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ## Dependencies
 

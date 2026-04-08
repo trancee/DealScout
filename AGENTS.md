@@ -15,6 +15,7 @@ Act as a Senior Software Architect. Prioritize modularity, maintainability, and 
 2. **Test-Driven Mentality:** Write unit tests for new logic before or alongside implementation. Ensure tests verify the "happy path" and edge cases.
 3. **Incremental Refactoring:** When modifying existing code, look for opportunities to simplify or modularize "messy" areas without being asked.
 4. **Context Management:** If the current file context is becoming too large, suggest moving helper functions to a utility module.
+5. **Update Docs Before Committing:** Every code change must include corresponding documentation updates (README.md, code comments, config examples) in the same commit. Never commit code without verifying the docs reflect the change.
 
 ## ✍️ Coding Standards
 - **Naming:** Use descriptive, intention-revealing names. (e.g., `calculate_user_retention` instead of `calc_ret`).

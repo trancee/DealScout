@@ -49,7 +49,7 @@ func (e *Evaluator) Evaluate(cleanedName, category, shop string, priceCHF float6
 	}
 
 	if !inSanityBounds(priceCHF, rule) {
-		slog.Warn("price outside sanity bounds", "product", cleanedName, "price", priceCHF)
+		slog.Warn("price outside sanity bounds", "product", cleanedName, "shop", shop, "price", priceCHF, "url", url)
 		return Result{Skipped: true, Reason: "sanity"}
 	}
 

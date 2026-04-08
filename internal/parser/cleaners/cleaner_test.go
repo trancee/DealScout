@@ -194,3 +194,28 @@ func TestBrackShopCleaner(t *testing.T) {
 		})
 	}
 }
+
+func TestConradShopCleaner(t *testing.T) {
+	clean := cleaners.ShopCleaner("conrad")
+	if clean == nil {
+		t.Fatal("ShopCleaner(conrad) returned nil")
+	}
+
+	tests := []struct {
+		input, want string
+	}{
+		{"Xiaomi Redmi 9AT Smartphone  32 GB 16.6 cm (6.53 Zoll) Gletscherblau Android 10 Dual-SIM", "Xiaomi Redmi 9AT"},
+		{"Samsung Galaxy A54 5G Smartphone 128 GB 16.3 cm", "Samsung Galaxy A54"},
+		{"Samsung XCover 7 Enterprise Edition 128 GB Schwarz", "Samsung Galaxy XCover 7 EE"},
+		{"Nokia Nokia 105 (2023)", "Nokia 105 (2023)"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got := clean(tt.input)
+			if got != tt.want {
+				t.Errorf("got %q, want %q", got, tt.want)
+			}
+		})
+	}
+}

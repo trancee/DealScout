@@ -85,3 +85,32 @@ shops:
           url: "url"
           image: "images.0.sizes.0.src"
         currency: "CHF"
+
+  - name: "Conrad"
+    source_type: "json"
+    method: "POST"
+    cleaner: "conrad"
+    base_url: "https://www.conrad.ch"
+    headers:
+      content-type: "application/json"
+    categories:
+      - category: "smartphone"
+        url: "https://api.conrad.ch/search/1/v3/facetSearch/ch/de/b2c?apikey=2cHbdksbmXc6PQDkPzRVFOcdladLvH7w"
+        body_template: "templates/conrad_search.json"
+        max_pages: 1
+        fields:
+          products: "hits"
+          title: "title"
+          url: "productId"
+          image: "image"
+        price_api:
+          url: "https://api.conrad.ch/price-availability/4/CQ_CH_B2C/facade?apikey=2cHbdksbmXc6PQDkPzRVFOcdladLvH7w&forceStorePrice=false&overrideCalculationSchema=GROSS"
+          body_template: "templates/conrad_prices.json"
+          headers:
+            content-type: "application/json"
+            accept: "application/json"
+          products_path: "priceAndAvailabilityFacadeResponse.products.product"
+          id_path: "articleId"
+          price_path: "offers.offer.price.price"
+          old_price_path: "offers.offer.price.crossedOutPrice"
+        currency: "CHF"

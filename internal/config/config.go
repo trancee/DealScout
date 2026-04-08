@@ -88,6 +88,9 @@ func resolvePaths(configDir string, cfg *Config) {
 			if bt != "" && !filepath.IsAbs(bt) {
 				cfg.Shops[i].Categories[j].BodyTemplate = filepath.Join(configDir, bt)
 			}
+			if pa := cfg.Shops[i].Categories[j].PriceAPI; pa != nil && pa.BodyTemplate != "" && !filepath.IsAbs(pa.BodyTemplate) {
+				cfg.Shops[i].Categories[j].PriceAPI.BodyTemplate = filepath.Join(configDir, pa.BodyTemplate)
+			}
 		}
 	}
 }

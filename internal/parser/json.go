@@ -47,9 +47,11 @@ func ParseJSON(data []byte, fields map[string]string) ([]RawProduct, error) {
 			continue
 		}
 
-		price, err := walkFloat(item, fields["price"])
-		if err != nil {
-			continue
+		var price float64
+		if fields["price"] != "" {
+			if p, err := walkFloat(item, fields["price"]); err == nil {
+				price = p
+			}
 		}
 
 		product := RawProduct{

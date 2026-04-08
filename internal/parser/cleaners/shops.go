@@ -75,3 +75,29 @@ func cleanBrack(name string) string {
 
 	return strings.TrimSpace(name)
 }
+
+var conradSpecRe = regexp.MustCompile(`\s*[-,]\s+|\W\+\s+|EU |\d+\s*GB|\s*\d+G|\s+\(Version 20[12]\d\)|\s+\(Grade [A-Z]\)|\s+(((Senioren-|senior |Industrie |Outdoor )?Smartphone)|\s*CH$|Satellite|Ex-geschütztes Handy|Fusion( Holiday Edition)?|Refurbished|\(PRODUCT\) RED™|Weiß)`)
+
+func cleanConrad(name string) string {
+	name = strings.NewReplacer(
+		"Enterprise Edition", "EE",
+		"Renewd® ", "",
+		"refurbished", "",
+		"5G Smartphone", "",
+		"Samsung XCover", "Samsung Galaxy XCover",
+		"Edge20", "Edge 20",
+		"Edge Neo 40", "Edge 40 Neo",
+	).Replace(name)
+
+	// Remove duplicate brand prefix (e.g., "Nokia Nokia 105")
+	parts := strings.SplitN(name, " ", 3)
+	if len(parts) >= 2 && strings.EqualFold(parts[0], parts[1]) {
+		name = parts[0] + " " + strings.Join(parts[2:], " ")
+	}
+
+	if loc := conradSpecRe.FindStringSubmatchIndex(name); loc != nil {
+		name = name[:loc[0]]
+	}
+
+	return strings.TrimSpace(name)
+}

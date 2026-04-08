@@ -72,6 +72,10 @@ func processShop(shop config.Shop, f *fetcher.Fetcher, conv *currency.Converter,
 				continue
 			}
 
+			if cat.PriceAPI != nil {
+				rawProducts = enrichPrices(rawProducts, cat.PriceAPI, f, cat, shop)
+			}
+
 			for _, p := range rawProducts {
 				products++
 
@@ -124,6 +128,13 @@ func fetchPage(f *fetcher.Fetcher, shop config.Shop, cat config.ShopCategory, pa
 		url := strings.ReplaceAll(cat.URL, "{page}", fmt.Sprintf("%d", pageNum))
 		return f.Get(url)
 	default:
+		if cat.BodyTemplate != "" {
+			tpl, err := os.ReadFile(cat.BodyTemplate)
+			if err != nil {
+				return nil, fmt.Errorf("loading template %s: %w", cat.BodyTemplate, err)
+			}
+			return f.Post(cat.URL, string(tpl), nil, shop.Headers)
+		}
 		return f.Get(cat.URL)
 	}
 }

@@ -48,7 +48,20 @@ type ShopCategory struct {
 	Fields       map[string]string `yaml:"fields"`
 	JSONSelector string            `yaml:"json_selector"`
 	PriceDivisor float64           `yaml:"price_divisor"`
+	PriceAPI     *PriceAPI         `yaml:"price_api"`
 	Currency     string            `yaml:"currency"`
+}
+
+// PriceAPI defines a secondary API call to fetch prices for products.
+type PriceAPI struct {
+	URL          string            `yaml:"url"`
+	BodyTemplate string            `yaml:"body_template"`
+	Headers      map[string]string `yaml:"headers"`
+	IDField      string            `yaml:"id_field"`
+	PricePath    string            `yaml:"price_path"`
+	OldPricePath string            `yaml:"old_price_path"`
+	IDPath       string            `yaml:"id_path"`
+	ProductsPath string            `yaml:"products_path"`
 }
 
 // Pagination defines how to navigate through listing pages.

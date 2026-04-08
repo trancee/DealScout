@@ -1,0 +1,8 @@
+{
+  "ns:inputArticleItemList": {
+    "#namespaces": {
+      "ns": "http://www.conrad.de/ccp/basit/service/article/priceandavailabilityservice/api"
+    },
+    "articles": {articles}
+  }
+}

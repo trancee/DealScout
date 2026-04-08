@@ -750,3 +750,6 @@ Run: `go test ./...`
 | 46 | Price divisor | `price_divisor` on shop category divides parsed prices (for APIs returning cents) |
 | 47 | Composite title | `title_prefix` field path prepended to `title` (e.g., brand + model) |
 | 48 | Map products | JSON parser handles `map[string]object` in addition to arrays at the products path |
+| 49 | Two-step price API | `price_api` config enriches products with prices from a secondary API call |
+| 50 | Optional price field | JSON parser treats price as optional (defaults to 0) for search-only APIs |
+| 51 | POST body detection | `fetchPage` sends POST when `body_template` is set, regardless of pagination type |

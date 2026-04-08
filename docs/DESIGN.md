@@ -753,3 +753,4 @@ Run: `go test ./...`
 | 49 | Two-step price API | `price_api` config enriches products with prices from a secondary API call |
 | 50 | Optional price field | JSON parser treats price as optional (defaults to 0) for search-only APIs |
 | 51 | POST body detection | `fetchPage` sends POST when `body_template` is set, regardless of pagination type |
+| 52 | Foletti shop | HTML parsing with `page_param` pagination, spec-stripping cleaner |

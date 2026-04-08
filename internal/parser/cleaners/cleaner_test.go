@@ -219,3 +219,29 @@ func TestConradShopCleaner(t *testing.T) {
 		})
 	}
 }
+
+func TestFolettiShopCleaner(t *testing.T) {
+	clean := cleaners.ShopCleaner("foletti")
+	if clean == nil {
+		t.Fatal("ShopCleaner(foletti) returned nil")
+	}
+
+	tests := []struct {
+		input, want string
+	}{
+		{"Samsung Galaxy A16 128 GB Schwarz", "Samsung Galaxy A16"},
+		{"Apple iPhone 16 Pro 256 GB Desert Titanium", "Apple iPhone 16 Pro"},
+		{"Xiaomi Redmi 15C 17.5 cm (6.9) 4G USB Type-C 4 GB 128 GB 6000 mAh Black", "Xiaomi Redmi 15C"},
+		{"Motorola moto g05 - 6.67 Zoll - Dual SIM", "Motorola moto g05"},
+		{"Samsung Galaxy XCover 7 Enterprise Edition", "Samsung Galaxy XCover 7 EE"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got := clean(tt.input)
+			if got != tt.want {
+				t.Errorf("got %q, want %q", got, tt.want)
+			}
+		})
+	}
+}

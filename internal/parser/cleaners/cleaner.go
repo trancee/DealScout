@@ -21,6 +21,8 @@ func ShopCleaner(shopName string) CleanFunc {
 		return cleanBrack
 	case "conrad":
 		return cleanConrad
+	case "foletti":
+		return cleanFoletti
 	default:
 		return nil
 	}

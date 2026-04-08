@@ -114,3 +114,24 @@ shops:
           price_path: "offers.offer.price.price"
           old_price_path: "offers.offer.price.crossedOutPrice"
         currency: "CHF"
+
+  - name: "Foletti"
+    source_type: "html"
+    cleaner: "foletti"
+    base_url: "https://superstore.foletti.com"
+    categories:
+      - category: "smartphone"
+        url: "https://superstore.foletti.com/de/categories/it--multimedia/telekommunikation/mobiltelefone/smartphone?price-min=50&price-max=350&limit=100&sort=price|asc&listStyle=list&page={page}"
+        max_pages: 3
+        pagination:
+          type: "page_param"
+          param: "page"
+          start: 1
+        selectors:
+          product_card: "div.item.card"
+          title: "span.productName a"
+          price: "span.first_price span.price"
+          old_price: "span.second_price span.price"
+          url: "h4 a[href]"
+          image: "img.img-fluid[src]"
+        currency: "CHF"

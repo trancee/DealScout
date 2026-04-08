@@ -101,3 +101,15 @@ func cleanConrad(name string) string {
 
 	return strings.TrimSpace(name)
 }
+
+var folettiSpecRe = regexp.MustCompile(`(?i)\s*[-,]+\s+|\s*\(?(\d+(\s*GB)?[+/])?\d+\s*GB\)?|\s*[45]G|(2|4|6|8|12)/(64|128|256?B?)(GB)?|\s+\(?20[12]\d\)?|\s*\d+([,.]\d+)?\s*(cm|inch|\")|\d{4,5}\s*mAh|\s+20[12]\d|\s+(Hybrid|Dual\W(SIM|Sim)|\s*CH( -|$)|inkl\.|LTE|NFC|smartphone)`)
+
+func cleanFoletti(name string) string {
+	name = strings.NewReplacer("Enterprise Edition", "EE", "Enterprise", "EE", "Renewd ", "", "SMARTPHONE ", "", "Smartphone ", "", "Smartfon ", "").Replace(name)
+
+	if loc := folettiSpecRe.FindStringSubmatchIndex(name); loc != nil {
+		name = name[:loc[0]]
+	}
+
+	return strings.TrimSpace(name)
+}

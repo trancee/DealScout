@@ -6,7 +6,7 @@
 [[repos]]
 repo = "builtin"
 hooks = [
-    { id = "check-yaml" },
+    { id = "check-yaml", exclude = "testdata/" },
     { id = "check-merge-conflict" },
     { id = "end-of-file-fixer" },
     { id = "trailing-whitespace" },
@@ -26,7 +26,7 @@ repo = "https://github.com/dnephin/pre-commit-golang"
 rev = "v0.5.1"
 hooks = [
     { id = "go-fmt" },
-    { id = "go-vet" },
+    { id = "go-vet", args = ["./..."] },
     { id = "go-build" },
     { id = "go-imports" },
     { id = "go-mod-tidy" },

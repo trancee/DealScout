@@ -24,6 +24,9 @@ shops:
     source_type: "json"
     method: "POST"
     cleaner: "galaxus"
+    headers:
+      content-type: "application/json"
+      apollo-require-preflight: "true"
     categories:
       - category: "smartphone"
         url: "https://www.galaxus.ch/api/graphql/product-type-filter-products"

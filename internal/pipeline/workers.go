@@ -109,7 +109,7 @@ func fetchPage(f *fetcher.Fetcher, shop config.Shop, cat config.ShopCategory, pa
 			return nil, fmt.Errorf("loading template %s: %w", cat.BodyTemplate, err)
 		}
 		replacements := map[string]string{"{offset}": fmt.Sprintf("%d", offset)}
-		return f.Post(cat.URL, string(tpl), replacements)
+		return f.Post(cat.URL, string(tpl), replacements, shop.Headers)
 	case "page_param":
 		pageNum := cat.Pagination.Start + page
 		url := strings.ReplaceAll(cat.URL, "{page}", fmt.Sprintf("%d", pageNum))

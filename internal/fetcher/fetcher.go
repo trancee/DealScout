@@ -46,20 +46,20 @@ func (f *Fetcher) WithRetryBaseDelay(d time.Duration) *Fetcher {
 
 // Get fetches a URL via HTTP GET and returns the response body.
 func (f *Fetcher) Get(url string) ([]byte, error) {
-	return f.doWithRetries("GET", url, "")
+	return f.doWithRetries("GET", url, "", nil)
 }
 
 // Post fetches a URL via HTTP POST with a body built from a template string
-// with placeholder replacements applied.
-func (f *Fetcher) Post(url string, bodyTemplate string, replacements map[string]string) ([]byte, error) {
+// with placeholder replacements applied. Optional headers are added to the request.
+func (f *Fetcher) Post(url string, bodyTemplate string, replacements map[string]string, headers map[string]string) ([]byte, error) {
 	body := bodyTemplate
 	for placeholder, value := range replacements {
 		body = strings.ReplaceAll(body, placeholder, value)
 	}
-	return f.doWithRetries("POST", url, body)
+	return f.doWithRetries("POST", url, body, headers)
 }
 
-func (f *Fetcher) doWithRetries(method, url, body string) ([]byte, error) {
+func (f *Fetcher) doWithRetries(method, url, body string, headers map[string]string) ([]byte, error) {
 	var lastErr error
 
 	for attempt := range f.maxRetries {
@@ -70,7 +70,7 @@ func (f *Fetcher) doWithRetries(method, url, body string) ([]byte, error) {
 
 		f.rateLimit()
 
-		respBody, statusCode, err := f.do(method, url, body)
+		respBody, statusCode, err := f.do(method, url, body, headers)
 		if err != nil {
 			lastErr = err
 			continue
@@ -92,7 +92,7 @@ func (f *Fetcher) doWithRetries(method, url, body string) ([]byte, error) {
 	return nil, fmt.Errorf("max retries (%d) exceeded: %w", f.maxRetries, lastErr)
 }
 
-func (f *Fetcher) do(method, url, body string) ([]byte, int, error) {
+func (f *Fetcher) do(method, url, body string, headers map[string]string) ([]byte, int, error) {
 	var bodyReader io.Reader
 	if body != "" {
 		bodyReader = strings.NewReader(body)
@@ -106,6 +106,9 @@ func (f *Fetcher) do(method, url, body string) ([]byte, int, error) {
 	req.Header.Set("User-Agent", f.nextUserAgent())
 	if body != "" {
 		req.Header.Set("Content-Type", "application/json")
+	}
+	for k, v := range headers {
+		req.Header.Set(k, v)
 	}
 
 	resp, err := f.client.Do(req)

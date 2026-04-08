@@ -28,12 +28,13 @@ type Settings struct {
 
 // Shop represents a single shop with its categories.
 type Shop struct {
-	Name       string         `yaml:"name"`
-	SourceType string         `yaml:"source_type"`
-	Method     string         `yaml:"method"`
-	Cleaner    string         `yaml:"cleaner"`
-	BaseURL    string         `yaml:"base_url"`
-	Categories []ShopCategory `yaml:"categories"`
+	Name       string            `yaml:"name"`
+	SourceType string            `yaml:"source_type"`
+	Method     string            `yaml:"method"`
+	Cleaner    string            `yaml:"cleaner"`
+	BaseURL    string            `yaml:"base_url"`
+	Headers    map[string]string `yaml:"headers"`
+	Categories []ShopCategory    `yaml:"categories"`
 }
 
 // ShopCategory represents one category within a shop.

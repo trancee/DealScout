@@ -41,7 +41,7 @@ func TestPostWithTemplateReplacements(t *testing.T) {
 	template := `{"offset": {offset}, "limit": {limit}}`
 	replacements := map[string]string{"{offset}": "24", "{limit}": "12"}
 
-	_, err := f.Post(server.URL, template, replacements)
+	_, err := f.Post(server.URL, template, replacements, nil)
 	if err != nil {
 		t.Fatalf("Post: %v", err)
 	}

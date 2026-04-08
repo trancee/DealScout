@@ -1,0 +1,42 @@
+{
+  "data": {
+    "productType": {
+      "filterProducts": {
+        "products": {
+          "results": [
+            {
+              "product": {
+                "name": "Samsung Galaxy S24 FE 128 GB",
+                "productId": "42853311",
+                "imageUrl": "https://images.example.com/s24fe.jpg"
+              },
+              "offer": {
+                "price": {
+                  "amountInclusive": 399.0
+                },
+                "insteadOfPrice": {
+                  "price": {
+                    "amountInclusive": 449.0
+                  }
+                }
+              }
+            },
+            {
+              "product": {
+                "name": "Google Pixel 9 256 GB",
+                "productId": "45123456",
+                "imageUrl": "https://images.example.com/pixel9.jpg"
+              },
+              "offer": {
+                "price": {
+                  "amountInclusive": 549.0
+                },
+                "insteadOfPrice": null
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

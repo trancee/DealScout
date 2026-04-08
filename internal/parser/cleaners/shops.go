@@ -155,3 +155,15 @@ func cleanMobilezone(name string) string {
 
 	return strings.TrimSpace(name)
 }
+
+var orderflowSpecRe = regexp.MustCompile(`\s+\(?(\d\+)?\d+\s*GB?|\s+\(?\d+(\.\d+)?"|\s+\(?[2345]G\)?| Dual SIM|, |\s*CH$`)
+
+func cleanOrderflow(name string) string {
+	name = strings.NewReplacer("Motorola Mobility ", "", "Enterprise Edition", "EE", " 4G ", " ").Replace(name)
+
+	if loc := orderflowSpecRe.FindStringSubmatchIndex(name); loc != nil {
+		name = name[:loc[0]]
+	}
+
+	return strings.TrimSpace(name)
+}

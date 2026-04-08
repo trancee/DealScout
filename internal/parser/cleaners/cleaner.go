@@ -29,6 +29,8 @@ func ShopCleaner(shopName string) CleanFunc {
 		return cleanMediamarkt
 	case "mobilezone":
 		return cleanMobilezone
+	case "orderflow":
+		return cleanOrderflow
 	default:
 		return nil
 	}

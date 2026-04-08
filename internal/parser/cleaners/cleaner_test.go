@@ -321,3 +321,29 @@ func TestMobilezoneShopCleaner(t *testing.T) {
 		})
 	}
 }
+
+func TestOrderflowShopCleaner(t *testing.T) {
+	clean := cleaners.ShopCleaner("orderflow")
+	if clean == nil {
+		t.Fatal("ShopCleaner(orderflow) returned nil")
+	}
+
+	tests := []struct {
+		input, want string
+	}{
+		{"Samsung Galaxy A16 128 GB Schwarz", "Samsung Galaxy A16"},
+		{"Apple iPhone 16 Pro 256 GB Desert Titanium 5G", "Apple iPhone 16 Pro"},
+		{"Motorola Mobility moto g15 128GB Dual SIM", "moto g15"},
+		{"Samsung Galaxy XCover 7 Enterprise Edition 128 GB", "Samsung Galaxy XCover 7 EE"},
+		{"Nokia 225 4G 128 MB Blau", "Nokia 225 128 MB Blau"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got := clean(tt.input)
+			if got != tt.want {
+				t.Errorf("got %q, want %q", got, tt.want)
+			}
+		})
+	}
+}

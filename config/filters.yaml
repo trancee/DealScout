@@ -1,0 +1,9 @@
+smartphone:
+  skip_brands:
+    - Doro
+    - Emporia
+  exclusion_regex: "(?i)Cover|Hülle|Schutzfolie"
+
+laptop:
+  skip_brands: []
+  exclusion_regex: "(?i)Tasche|Sleeve"

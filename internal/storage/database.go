@@ -3,6 +3,8 @@ package storage
 import (
 	"database/sql"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	_ "modernc.org/sqlite"
 )
@@ -15,6 +17,12 @@ type Database struct {
 // Open creates or opens a SQLite database at the given path with WAL mode.
 // Use ":memory:" for in-memory testing.
 func Open(dbPath string) (*Database, error) {
+	if dbPath != ":memory:" {
+		if err := os.MkdirAll(filepath.Dir(dbPath), 0o750); err != nil {
+			return nil, fmt.Errorf("creating database directory: %w", err)
+		}
+	}
+
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("opening database: %w", err)

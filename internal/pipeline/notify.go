@@ -69,8 +69,10 @@ func logProducts(products []ProductResult) {
 
 	for _, p := range products {
 		marker := "    "
-		if p.IsDeal {
+		if p.IsDeal && p.IsCheapest {
 			marker = " 🔥 "
+		} else if p.IsDeal {
+			marker = " 💲 "
 		}
 
 		discount := ""

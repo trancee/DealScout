@@ -21,14 +21,15 @@ type Options struct {
 
 // ProductResult tracks a product that was evaluated during the run.
 type ProductResult struct {
-	Name     string
-	Shop     string
-	Price    float64
-	OldPrice *float64
-	Discount float64
-	URL      string
-	IsDeal   bool
-	Reason   string
+	Name       string
+	Shop       string
+	Price      float64
+	OldPrice   *float64
+	Discount   float64
+	URL        string
+	IsDeal     bool
+	IsCheapest bool
+	Reason     string
 }
 
 // Summary holds run statistics.
@@ -58,6 +59,8 @@ func Run(cfg *config.Config, db *storage.Database, opts Options) Summary {
 	shops := filterShops(cfg.Shops, opts.ShopName)
 	cache := newResponseCache(cfg.Settings.CacheDir, cfg.Settings.CacheTTLMinutes)
 	deals := collectDeals(shops, f, conv, eval, cfg.Filters, opts.Seed, opts.DumpDir, cache, &summary)
+	deals = deduplicateDeals(deals)
+	markCheapest(summary.Products)
 
 	summary.DealsFound = len(deals)
 	sendNotifications(deals, cfg, db, opts, &summary)

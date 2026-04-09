@@ -66,6 +66,8 @@ type PriceAPI struct {
 	PricePath    string            `yaml:"price_path"`
 	OldPricePath string            `yaml:"old_price_path"`
 	IDPath       string            `yaml:"id_path"`
+	TitlePath    string            `yaml:"title_path"`
+	ImagePath    string            `yaml:"image_path"`
 	ProductsPath string            `yaml:"products_path"`
 }
 

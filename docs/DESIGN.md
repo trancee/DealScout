@@ -764,4 +764,7 @@ Run: `go test ./...`
 | 60 | Dynamic price placeholders | `{min_price}`, `{max_price}` in URLs and templates resolved from deal rules; `{base64_start}...{base64_end}` for encoded filters |
 | 61 | Data directory at root | `data/` lives at project root (CWD), not under config dir |
 | 62 | URL resolution after enrichment | Product URLs resolved after price enrichment to avoid corrupting IDs used by secondary APIs |
-| 63 | URL template | `url_template` with `{id}` placeholder for shops with custom product URL patterns (e.g., Conrad) |
+| 63 | URL template | `url_template` with `{id}` placeholder for shops with custom product URL patterns (e.g., Conrad, Interdiscount, Alltron) |
+| 64 | GET price enrichment | `price_api` supports GET with `{ids}` placeholder for comma-joined product IDs (e.g., Alltron tiles API) |
+| 65 | Price API title/image | `title_path` and `image_path` on `price_api` enrich products with title and image from secondary API |
+| 66 | Optional title in JSON | JSON parser allows empty titles for SKU-only search APIs enriched by a secondary API |

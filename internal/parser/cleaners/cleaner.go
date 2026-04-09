@@ -31,6 +31,8 @@ func ShopCleaner(shopName string) CleanFunc {
 		return cleanMobilezone
 	case "orderflow":
 		return cleanOrderflow
+	case "alltron":
+		return cleanAlltron
 	default:
 		return nil
 	}

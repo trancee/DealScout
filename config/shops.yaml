@@ -17,6 +17,34 @@ shops:
           image: ".product-card-image img[src]"
         currency: "CHF"
 
+  - name: "Alltron"
+    source_type: "json"
+    cleaner: "alltron"
+    base_url: "https://alltron.ch"
+    headers:
+      accept-language: "de"
+      accept: "application/json"
+      x-requested-with: "XMLHttpRequest"
+    categories:
+      - category: "smartphone"
+        url: "https://alltron.ch/api/v1/catalog/search?path=%2Ftelco-ucc%2Fmobiltelefonie%2Fsmartphones&limit=48&page=1&sortProducts=priceasc&filters=availability%3A%3A%3AVerf%C3%BCgbar%7C%7C%7Cprice_standard%3A%3A%3A{min_price}~~~{max_price}&listView=listshop&searchEarlyFilter=true&format=json"
+        max_pages: 1
+        fields:
+          products: "products"
+          url: "sku"
+        url_template: "https://alltron.ch/de/product/{id}"
+        price_api:
+          url: "https://alltron.ch/api/v1/products/multiple-tiles/{ids}"
+          headers:
+            accept-language: "de"
+            accept: "application/json"
+            x-requested-with: "XMLHttpRequest"
+          price_path: "effectivePricing.userPrice"
+          old_price_path: "effectivePricing.mainPrice"
+          title_path: "description.title"
+          image_path: "cover.sizes.0.link"
+        currency: "CHF"
+
   - name: "Amazon"
     source_type: "html"
     cleaner: "amazon"
@@ -160,6 +188,7 @@ shops:
           price: "productPriceData.prices.0.finalPrice.value"
           old_price: "productPriceData.prices.0.insteadPrice.value"
           url: "code"
+        url_template: "https://www.interdiscount.ch/de/p/--p{id}"
         currency: "CHF"
 
   - name: "Mediamarkt"
@@ -188,7 +217,7 @@ shops:
     cleaner: "mobilezone"
     categories:
       - category: "smartphone"
-        url: "https://search.epoq.de/inbound-servletapi/getSearchResult?full&ff=e:alloc_THEME&fv=alle_handys&ff=c:anzeigename&fv=Handys&ff=e:isPriceVariant&fv=0&callback=X&tenantId=mobilezone-ch-2019&sessionId=f87cc9415cf968d4d633dd6d15f812ca&orderBy=e:sorting_price&order=asc&limit=100&offset=0&style=compact&format=json&query="
+        url: "https://search.epoq.de/inbound-servletapi/getSearchResult?full&ff=e:alloc_THEME&fv=Mobilegeraete_Alle_Handys&ff=g:price&fv=>{min_price}&ff=g:price&fv=<{max_price}&ff=e:isPriceVariant&fv=0&ff=e:isPriceVariant&fv=0&callback=X&tenantId=mobilezone-ch-2019&sessionId=7a8ffbd5f43f44f3946dd642a0e86a7&orderBy=e:sorting_price&order=asc&limit=100&offset=0&locakey=de-CH&style=compact&format=json&query="
         max_pages: 1
         jsonp_callback: "X"
         fields:
@@ -205,7 +234,7 @@ shops:
     base_url: "https://www.orderflow.ch"
     categories:
       - category: "smartphone"
-        url: "https://www.orderflow.ch/de/categories/elektronik/kommunikation/mobiltelefone?price-min={min_price}&price-max={max_price}&limit=100&sort=price|asc&c300101=30010104,30010117,30010105,30010103&page={page}"
+        url: "https://www.orderflow.ch/de/categories/elektronik/kommunikation/mobiltelefone?price-min={min_price}&price-max={max_price}&limit=100&sort=price%7Casc&c300101=%5B30010117%2C30010105%2C30010104%5D&page={page}"
         max_pages: 3
         pagination:
           type: "page_param"

@@ -44,9 +44,6 @@ func ParseJSON(data []byte, fields map[string]string) ([]RawProduct, error) {
 		if titlePrefix := walkString(item, fields["title_prefix"]); titlePrefix != "" && title != "" {
 			title = titlePrefix + " " + title
 		}
-		if title == "" {
-			continue
-		}
 
 		var price float64
 		if fields["price"] != "" {

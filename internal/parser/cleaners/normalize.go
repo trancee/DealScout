@@ -8,7 +8,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-var colorRegex = regexp.MustCompile(`(?i)(in )?([/(,]?(Ancora|Aqua|Arctic|Astral|Astro|Atlantic|Aurora|Awesome|Azul|Bamboo|Bianco|Black|(Hell ?|Pazifik)?Blau|Bleu|Blue?|Burgund|Butter|Champagne|Charcoal|Chrome|Cloudy?|Clover|Copper|Cosmic|Cosmo|Dark|Denim|Diamond|Dusk|Electric|Elegant|Frost(ed)?|Galactic|Gelb|Glacier|Glazed|Glowing|Gold(ig)?|Gradient|Granite|Graphite|Gr[ae]y|Green|Grau|Gravity|Gris|Grün|Himalaya|Holunderweiss|Ic[ey]|Interstellar|Lagoon|Lake|Lavende[lr]|Light|(Dunkel)?Lila|Luminous|Magenta|Marine|Matte|Metallic|Meteorite|Meteor|Midday|Midnight|Mint(green)?|Misty?|Mitternacht(sschwarz)?|Moonlight|Mystic|Nachtgrün|Navy|Nero|Night|Noir|Obsidian|Ocean|Onyx|Orange| Oro|Pacific|Pastel|Peacock|Pearl|Pebble|Pepper|Perlmutweiss|Petrol|Piano|Pink(gold)?|Polar(stern)?|Prism|Purple|Red( Edition)?|Rosa|Rose|Ros[aée]gold|Rosso|Rot|Sage|Sakura|Salbeigrün|Sandy|Schwarz|Shadow|Silber|Silvery?|Sky|Space(grey)?|Stardust|Stargaze|Starlight|Starry|Star|Steel|Sterling|Sternenblau|Stone|Sunburst|Sunrise|Sunset|Titanium|Titan|Türkis|Twilight|Violette?|Violet|Waldgrün|Weiss|Weiß|White|Yellow|Zeus)\b[\s/]?)(Azur|Black|Blau|Bleen|Blue|Bronze|Cream|Dream|Gold|Green|Gr[ae]y|Grün|Grau|Lime|Navy|Onyx|Pink|Rose|Schwarz|Silber|Silver|White|Weiss)?[)]?`)
+var colorRegex = regexp.MustCompile(`(?i)(in )?([/(,]?(Ancora|Aqua|Arctic|Astral|Astro|Atlantic|Aurora|Awesome|Azul|Bamboo|Bianco|Black|(Hell ?|Pazifik)?Blau|Bleu|Blue?|Burgund|Butter|Champagne|Charcoal|Chrome|Cloudy?|Clover|Copper|Cosmic|Cosmo|Dark|Denim|Diamond|Dusk|Electric|Elegant|Frost(ed)?|Galactic|Gelb|Glacier|Glazed|Glowing|Gold(ig)?|Gradient|Granite|Graphite|Gr[ae]y|Green|Grau|Gravity|Gris|Grün|Himalaya|Holunderweiss|Ic[ey]|Interstellar|Lagoon|Lake|Lavende[lr]|Light|(Dunkel)?Lila|Luminous|Magenta|Marine|Matte|Metallic|Meteorite|Meteor|Midday|Midnight|Mint(green)?|Misty?|Mitternacht(sschwarz)?|Moonlight|Mystic|Nachtgrün|Navy|Nero|Night|Noir|Obsidian|Ocean|Onyx|Orange|Orchid| Oro|Pacific|Pastel|Peacock|Pearl|Pebble|Pepper|Perlmutweiss|Petrol|Piano|Pink(gold)?|Polar(stern)?|Prism|Purple|Red( Edition)?|Rosa|Rose|Ros[aée]gold|Rosso|Rot|Sage|Sakura|Salbeigrün|Sandy|Schwarz|Shadow|Silber|Silvery?|Sky|Space(grey)?|Stardust|Stargaze|Starlight|Starry|Star|Steel|Sterling|Sternenblau|Stone|Sunburst|Sunrise|Sunset|Titanium|Titan|Türkis|Twilight|Violette?|Violet|Waldgrün|Weiss|Weiß|White|Yellow|Zeus)\b[\s/]?)(Azur|Black|Blau|Bleen|Blue|Bronze|Cream|Dream|Gold|Green|Gr[ae]y|Grün|Grau|Lime|Navy|Onyx|Pink|Rose|Schwarz|Silber|Silver|White|Weiss)?[)]?`)
 
 var nameMapping = map[string]string{
 	"Ee": "EE", "Fe": "FE", "Gt": "GT", "Hd": "HD",
@@ -65,6 +65,13 @@ func productNormalizer(name string) string {
 	s := strings.Split(name, " ")
 	brand := strings.ToLower(s[0])
 
+	if brand == "the" {
+		name = strings.Join(s[1:], " ")
+
+		s = strings.Split(name, " ")
+		brand = strings.ToLower(s[0])
+	}
+
 	if brand == "iphone" {
 		name = "Apple" + " " + name
 
@@ -75,7 +82,7 @@ func productNormalizer(name string) string {
 	if brand == "apple" {
 		name = strings.Split(name, "/")[0]
 
-		name = regexp.MustCompile(`\s+SE\s*\(?(2016|2020|2022)\)?`).ReplaceAllString(name, " SE ($1)")
+		name = regexp.MustCompile(`(?i)\s+SE\s*\(?(2016|2020|2022)\)?`).ReplaceAllString(name, " SE ($1)")
 		name = regexp.MustCompile(`(?i)\(?1(\.|st)\s*Gen(eration)?\.?\)?`).ReplaceAllString(name, "(2016)")
 		name = regexp.MustCompile(`(?i)\(?2(\.|nd)\s*Gen(eration)?\.?\)?`).ReplaceAllString(name, "(2020)")
 		name = regexp.MustCompile(`(?i)\(?3(\.|rd)\s*Gen(eration)?\.?\)?`).ReplaceAllString(name, "(2022)")
@@ -99,6 +106,10 @@ func productNormalizer(name string) string {
 		name = regexp.MustCompile(`(?i)BV\s*(\d+)`).ReplaceAllString(name, "BV$1")
 		// name = regexp.MustCompile(`(?i)(B[LV]\d+)\s*s`).ReplaceAllString(name, "$1s")
 		name = regexp.MustCompile(`(?i)\(\d+\)`).ReplaceAllString(name, "")
+	}
+
+	if brand == "fairphone" {
+		name = regexp.MustCompile(`(?i)Fairphone\s*\(?Gen(eration)?\.?\s*(\d+)\)?`).ReplaceAllString(name, "Fairphone $2")
 	}
 
 	if brand == "gigaset" {
@@ -307,8 +318,8 @@ func productNormalizer(name string) string {
 	if brand == "zte" {
 		name = regexp.MustCompile(`(?i)nubia`).ReplaceAllString(name, "nubia")
 
-		name = regexp.MustCompile(`(Blade\s*)?([AV])\s*(\d+)(\s*([Ss]))?`).ReplaceAllString(name, "Blade $2$3$5")
-		name = regexp.MustCompile(`[S]\s*$`).ReplaceAllStringFunc(name, strings.ToLower)
+		name = regexp.MustCompile(`(Blade\s*)?([AV])\s*(\d+)(\s*([EeSs]))?`).ReplaceAllString(name, "Blade $2$3$5")
+		name = regexp.MustCompile(`[ES]\s*$`).ReplaceAllStringFunc(name, strings.ToLower)
 	}
 
 	return strings.TrimSpace(name)

@@ -21,9 +21,13 @@ func enrichPrices(products []parser.RawProduct, priceAPI *config.PriceAPI, f *fe
 
 	slog.Debug("enriching prices", "products", len(products))
 
-	body, err := buildPriceRequestBody(products, priceAPI, cat)
-	if err != nil {
-		slog.Error("building price API request", "error", err)
+	var ids []string
+	for _, p := range products {
+		if p.URL != "" {
+			ids = append(ids, p.URL)
+		}
+	}
+	if len(ids) == 0 {
 		return products
 	}
 
@@ -31,16 +35,31 @@ func enrichPrices(products []parser.RawProduct, priceAPI *config.PriceAPI, f *fe
 	data, cached := cache.get(shop.Name, priceCacheKey, 0)
 	if !cached {
 		var err error
-		data, err = f.Post(priceAPI.URL, body, nil, priceAPI.Headers)
-		if err != nil {
-			slog.Error("price API fetch failed", "url", priceAPI.URL, "error", err)
-			return products
+		if priceAPI.BodyTemplate != "" {
+			body, buildErr := buildPriceRequestBody(products, priceAPI)
+			if buildErr != nil {
+				slog.Error("building price API request", "error", buildErr)
+				return products
+			}
+			data, err = f.Post(priceAPI.URL, body, nil, priceAPI.Headers)
+			if err != nil {
+				slog.Error("price API fetch failed", "url", priceAPI.URL, "error", err)
+				return products
+			}
+			dumpResponse(dumpDir, shop.Name, priceCacheKey, 0,
+				"POST", priceAPI.URL, priceAPI.Headers, body, data)
+		} else {
+			url := strings.ReplaceAll(priceAPI.URL, "{ids}", strings.Join(ids, ","))
+			data, err = f.Get(url, priceAPI.Headers)
+			if err != nil {
+				slog.Error("price API fetch failed", "url", url, "error", err)
+				return products
+			}
+			dumpResponse(dumpDir, shop.Name, priceCacheKey, 0,
+				"GET", url, priceAPI.Headers, "", data)
 		}
 		cache.put(shop.Name, priceCacheKey, 0, data)
 	}
-
-	dumpResponse(dumpDir, shop.Name, priceCacheKey, 0,
-		"POST", priceAPI.URL, priceAPI.Headers, body, data)
 
 	priceMap, err := parsePriceResponse(data, priceAPI)
 	if err != nil {
@@ -48,33 +67,29 @@ func enrichPrices(products []parser.RawProduct, priceAPI *config.PriceAPI, f *fe
 		return products
 	}
 
-	return mergePrices(products, priceMap, priceAPI.IDField)
+	return mergePrices(products, priceMap)
 }
 
 type priceInfo struct {
 	price    float64
 	oldPrice *float64
+	title    string
+	imageURL string
 }
 
-func buildPriceRequestBody(products []parser.RawProduct, priceAPI *config.PriceAPI, cat config.ShopCategory) (string, error) {
-	if priceAPI.BodyTemplate == "" {
-		return "", fmt.Errorf("price_api.body_template is required")
-	}
-
+func buildPriceRequestBody(products []parser.RawProduct, priceAPI *config.PriceAPI) (string, error) {
 	tpl, err := os.ReadFile(priceAPI.BodyTemplate)
 	if err != nil {
 		return "", fmt.Errorf("loading price API template %s: %w", priceAPI.BodyTemplate, err)
 	}
 
-	// Build the articles array from product IDs for the {articles} placeholder.
 	var articles []map[string]any
 	for _, p := range products {
-		id := p.URL // URL field is used to carry the product ID from the search API
-		if id == "" {
+		if p.URL == "" {
 			continue
 		}
 		articles = append(articles, map[string]any{
-			"articleID":         id,
+			"articleID":         p.URL,
 			"insertCode":        "UO",
 			"calculatePrice":    true,
 			"checkAvailability": true,
@@ -87,8 +102,7 @@ func buildPriceRequestBody(products []parser.RawProduct, priceAPI *config.PriceA
 		return "", fmt.Errorf("marshaling articles: %w", err)
 	}
 
-	body := strings.ReplaceAll(string(tpl), "{articles}", string(articlesJSON))
-	return body, nil
+	return strings.ReplaceAll(string(tpl), "{articles}", string(articlesJSON)), nil
 }
 
 func parsePriceResponse(data []byte, priceAPI *config.PriceAPI) (map[string]priceInfo, error) {
@@ -97,16 +111,42 @@ func parsePriceResponse(data []byte, priceAPI *config.PriceAPI) (map[string]pric
 		return nil, fmt.Errorf("parsing price response: %w", err)
 	}
 
-	productsRaw := walkPath(root, priceAPI.ProductsPath)
-	arr, ok := productsRaw.([]interface{})
-	if !ok {
-		return nil, fmt.Errorf("price products path %q did not resolve to array", priceAPI.ProductsPath)
+	var items []interface{}
+	isMap := false
+
+	if priceAPI.ProductsPath != "" {
+		raw := walkPath(root, priceAPI.ProductsPath)
+		switch v := raw.(type) {
+		case []interface{}:
+			items = v
+		case map[string]interface{}:
+			isMap = true
+			for _, val := range v {
+				if val != nil {
+					items = append(items, val)
+				}
+			}
+		default:
+			return nil, fmt.Errorf("price products path %q resolved to %T", priceAPI.ProductsPath, raw)
+		}
+	} else if m, ok := root.(map[string]interface{}); ok {
+		isMap = true
+		for _, val := range m {
+			if val != nil {
+				items = append(items, val)
+			}
+		}
 	}
 
-	result := make(map[string]priceInfo, len(arr))
-	for _, item := range arr {
-		id := walkString(item, priceAPI.IDPath)
-		id = strings.TrimLeft(id, "0")
+	result := make(map[string]priceInfo, len(items))
+	for _, item := range items {
+		var id string
+		if priceAPI.IDPath != "" {
+			id = walkString(item, priceAPI.IDPath)
+			id = strings.TrimLeft(id, "0")
+		} else if isMap {
+			id = walkString(item, "sku")
+		}
 		if id == "" {
 			continue
 		}
@@ -122,6 +162,12 @@ func parsePriceResponse(data []byte, priceAPI *config.PriceAPI) (map[string]pric
 				info.oldPrice = &old
 			}
 		}
+		if priceAPI.TitlePath != "" {
+			info.title = walkString(item, priceAPI.TitlePath)
+		}
+		if priceAPI.ImagePath != "" {
+			info.imageURL = walkString(item, priceAPI.ImagePath)
+		}
 
 		result[id] = info
 	}
@@ -129,14 +175,19 @@ func parsePriceResponse(data []byte, priceAPI *config.PriceAPI) (map[string]pric
 	return result, nil
 }
 
-func mergePrices(products []parser.RawProduct, prices map[string]priceInfo, idField string) []parser.RawProduct {
+func mergePrices(products []parser.RawProduct, prices map[string]priceInfo) []parser.RawProduct {
 	var enriched []parser.RawProduct
 	for _, p := range products {
-		id := p.URL // product ID stored in URL field
-		if info, ok := prices[id]; ok {
+		if info, ok := prices[p.URL]; ok {
 			p.Price = info.price
 			if info.oldPrice != nil {
 				p.OldPrice = info.oldPrice
+			}
+			if info.title != "" {
+				p.Title = info.title
+			}
+			if info.imageURL != "" {
+				p.ImageURL = info.imageURL
 			}
 			enriched = append(enriched, p)
 		}
@@ -144,8 +195,6 @@ func mergePrices(products []parser.RawProduct, prices map[string]priceInfo, idFi
 	return enriched
 }
 
-// walkPath and walkString/walkFloat are reused from the json parser.
-// Import them via the parser package's exported functions.
 func walkPath(data interface{}, path string) interface{} {
 	if path == "" || data == nil {
 		return data

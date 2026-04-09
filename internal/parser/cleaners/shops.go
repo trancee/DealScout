@@ -128,7 +128,7 @@ func cleanFoletti(name string) string {
 	return strings.TrimSpace(name)
 }
 
-var interdiscountSpecRe = regexp.MustCompile(`\(\d+\s*GB?|\(\d\.\d{1,2}"|\s+[2345]G| LTE`)
+var interdiscountSpecRe = regexp.MustCompile(`\(\d+(\.\d+)?\s*[GM]B?|\(\d\.\d{1,2}"|\s+[2345]G| LTE`)
 
 func cleanInterdiscount(name string) string {
 	name = strings.NewReplacer("Enterprise Edition", "EE").Replace(name)
@@ -146,10 +146,10 @@ func cleanInterdiscount(name string) string {
 	return strings.TrimSpace(name)
 }
 
-var mediamarktSpecRe = regexp.MustCompile(` - |(64|128)\s*GB|\s+[2345]G|\s+CH$`)
+var mediamarktSpecRe = regexp.MustCompile(` - |\d+\s*G[Bb]|\s+[2345]G|Dual-SIM|\(EU\)|\s+CH$`)
 
 func cleanMediamarkt(name string) string {
-	name = strings.NewReplacer("ONE PLUS", "ONEPLUS", "Enterprise Edition", "EE").Replace(name)
+	name = strings.NewReplacer("ONE PLUS", "ONEPLUS", "Enterprise Edition", "EE", "6941764469662", "Note 70T", "13024998", "X6B").Replace(name)
 
 	if loc := mediamarktSpecRe.FindStringSubmatchIndex(name); loc != nil {
 		name = name[:loc[0]]
@@ -161,7 +161,7 @@ func cleanMediamarkt(name string) string {
 var mobilezoneSpecRe = regexp.MustCompile(`\s+\(?\d+\s*GB?|\s+\(?\d+(\.\d+)?"| Dual Sim`)
 
 func cleanMobilezone(name string) string {
-	name = strings.NewReplacer(" Xcover5", " XCover 5", " 5G", "").Replace(name)
+	name = strings.NewReplacer(" Xcover5", " XCover 5", " 5G", "", " 128 ", " ").Replace(name)
 
 	if loc := mobilezoneSpecRe.FindStringSubmatchIndex(name); loc != nil {
 		name = name[:loc[0]]
@@ -176,6 +176,18 @@ func cleanOrderflow(name string) string {
 	name = strings.NewReplacer("Motorola Mobility ", "", "Enterprise Edition", "EE", " 4G ", " ", "EU-Ware", "", "EU-Version", "").Replace(name)
 
 	if loc := orderflowSpecRe.FindStringSubmatchIndex(name); loc != nil {
+		name = name[:loc[0]]
+	}
+
+	return strings.TrimSpace(name)
+}
+
+var alltronSpecRe = regexp.MustCompile(`(\s*[-,]\s+)|(\d+\s*GB?)|\s+CH$`)
+
+func cleanAlltron(name string) string {
+	name = strings.NewReplacer("Enterprise Edition", "EE", "Fairphone Fairphone", "Fairphone", "EU-Ware", "").Replace(name)
+
+	if loc := alltronSpecRe.FindStringSubmatchIndex(name); loc != nil {
 		name = name[:loc[0]]
 	}
 

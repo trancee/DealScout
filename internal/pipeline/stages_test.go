@@ -24,7 +24,7 @@ func TestTransformProduct(t *testing.T) {
 	db := mustOpenDB(t)
 	conv := currency.New(db, "", "CHF", 24)
 
-	cat := config.ShopCategory{Currency: "CHF"}
+	cat := config.ShopCategory{Pricing: config.Pricing{Currency: "CHF"}}
 
 	p := parser.RawProduct{Title: "SAMSUNG Galaxy A16 128GB", Price: 149.0}
 	cleaned, priceCHF, skip := transformProduct(p, cat, nil, nil, conv)
@@ -44,7 +44,7 @@ func TestTransformProductWithDivisor(t *testing.T) {
 	db := mustOpenDB(t)
 	conv := currency.New(db, "", "CHF", 24)
 
-	cat := config.ShopCategory{Currency: "CHF", PriceDivisor: 100}
+	cat := config.ShopCategory{Pricing: config.Pricing{Currency: "CHF", PriceDivisor: 100}}
 
 	p := parser.RawProduct{Title: "Test Phone", Price: 14900.0}
 	_, priceCHF, skip := transformProduct(p, cat, nil, nil, conv)
@@ -61,7 +61,7 @@ func TestTransformProductFiltered(t *testing.T) {
 	db := mustOpenDB(t)
 	conv := currency.New(db, "", "CHF", 24)
 
-	cat := config.ShopCategory{Currency: "CHF"}
+	cat := config.ShopCategory{Pricing: config.Pricing{Currency: "CHF"}}
 	filter := func(name string) bool { return true } // skip everything
 
 	p := parser.RawProduct{Title: "Test Phone", Price: 100.0}
@@ -79,7 +79,7 @@ func TestEvaluateProductDeal(t *testing.T) {
 	}
 	eval := deal.NewEvaluator(db, rules, 24)
 	shop := config.Shop{Name: "TestShop"}
-	cat := config.ShopCategory{Category: "smartphone"}
+	cat := config.ShopCategory{Category: "smartphone", Pricing: config.Pricing{Currency: "CHF"}}
 
 	p := parser.RawProduct{Title: "Test Phone", Price: 149.0, URL: "https://example.com"}
 
@@ -103,7 +103,7 @@ func TestEvaluateProductSeedMode(t *testing.T) {
 	}
 	eval := deal.NewEvaluator(db, rules, 24)
 	shop := config.Shop{Name: "TestShop"}
-	cat := config.ShopCategory{Category: "smartphone"}
+	cat := config.ShopCategory{Category: "smartphone", Pricing: config.Pricing{Currency: "CHF"}}
 
 	p := parser.RawProduct{Title: "Test Phone", Price: 149.0}
 

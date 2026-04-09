@@ -13,12 +13,14 @@ func TestRegistryHTML(t *testing.T) {
 
 	cat := config.ShopCategory{
 		Category: "smartphone",
-		Selectors: map[string]string{
-			"product_card": "div[data-component-type='s-search-result']",
-			"title":        "h2 a span",
-			"price":        "span.a-price span.a-offscreen",
-			"url":          "h2 a[href]",
-			"image":        "img.s-image[src]",
+		Parsing: config.Parsing{
+			Selectors: map[string]string{
+				"product_card": "div[data-component-type='s-search-result']",
+				"title":        "h2 a span",
+				"price":        "span.a-price span.a-offscreen",
+				"url":          "h2 a[href]",
+				"image":        "img.s-image[src]",
+			},
 		},
 	}
 
@@ -36,12 +38,14 @@ func TestRegistryJSON(t *testing.T) {
 
 	cat := config.ShopCategory{
 		Category: "smartphone",
-		Fields: map[string]string{
-			"products": "data.productType.filterProducts.products.results",
-			"title":    "product.name",
-			"price":    "offer.price.amountInclusive",
-			"url":      "product.productId",
-			"image":    "product.imageUrl",
+		Parsing: config.Parsing{
+			Fields: map[string]string{
+				"products": "data.productType.filterProducts.products.results",
+				"title":    "product.name",
+				"price":    "offer.price.amountInclusive",
+				"url":      "product.productId",
+				"image":    "product.imageUrl",
+			},
 		},
 	}
 

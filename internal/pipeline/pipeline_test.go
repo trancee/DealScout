@@ -57,16 +57,17 @@ func TestDryRunFindsDeals(t *testing.T) {
 				Categories: []config.ShopCategory{
 					{
 						Category: "smartphone",
-						URL:      server.URL,
-						MaxPages: 1,
-						Selectors: map[string]string{
-							"product_card": "div.product",
-							"title":        "h2 a span",
-							"price":        "span.price",
-							"url":          "h2 a[href]",
-							"image":        "img.img[src]",
+						Fetching: config.Fetching{URL: server.URL, MaxPages: 1},
+						Parsing: config.Parsing{
+							Selectors: map[string]string{
+								"product_card": "div.product",
+								"title":        "h2 a span",
+								"price":        "span.price",
+								"url":          "h2 a[href]",
+								"image":        "img.img[src]",
+							},
 						},
-						Currency: "CHF",
+						Pricing: config.Pricing{Currency: "CHF"},
 					},
 				},
 			},
@@ -113,16 +114,17 @@ func TestSeedStoresButNoDeals(t *testing.T) {
 				Categories: []config.ShopCategory{
 					{
 						Category: "smartphone",
-						URL:      server.URL,
-						MaxPages: 1,
-						Selectors: map[string]string{
-							"product_card": "div.product",
-							"title":        "h2 a span",
-							"price":        "span.price",
-							"url":          "h2 a[href]",
-							"image":        "img.img[src]",
+						Fetching: config.Fetching{URL: server.URL, MaxPages: 1},
+						Parsing: config.Parsing{
+							Selectors: map[string]string{
+								"product_card": "div.product",
+								"title":        "h2 a span",
+								"price":        "span.price",
+								"url":          "h2 a[href]",
+								"image":        "img.img[src]",
+							},
 						},
-						Currency: "CHF",
+						Pricing: config.Pricing{Currency: "CHF"},
 					},
 				},
 			},
@@ -154,11 +156,10 @@ func TestShopFilter(t *testing.T) {
 
 	db := mustOpenDB(t)
 	cat := config.ShopCategory{
-		Category:  "smartphone",
-		URL:       server.URL,
-		MaxPages:  1,
-		Selectors: map[string]string{"product_card": "div.product", "title": "h2 a span", "price": "span.price"},
-		Currency:  "CHF",
+		Category: "smartphone",
+		Fetching: config.Fetching{URL: server.URL, MaxPages: 1},
+		Parsing:  config.Parsing{Selectors: map[string]string{"product_card": "div.product", "title": "h2 a span", "price": "span.price"}},
+		Pricing:  config.Pricing{Currency: "CHF"},
 	}
 	cfg := &config.Config{
 		Settings: config.Settings{BaseCurrency: "CHF", FetchDelaySeconds: 0, MaxRetries: 1, MaxConcurrentShops: 2, PriceHistoryRetentionDays: 90},

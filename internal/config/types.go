@@ -42,21 +42,50 @@ type Shop struct {
 }
 
 // ShopCategory represents one category within a shop.
+// Fields are grouped logically via inline sub-structs but remain flat in YAML.
 type ShopCategory struct {
-	Category      string            `yaml:"category"`
-	URL           string            `yaml:"url"`
-	URLs          []string          `yaml:"urls"`
-	BodyTemplate  string            `yaml:"body_template"`
-	MaxPages      int               `yaml:"max_pages"`
-	Pagination    Pagination        `yaml:"pagination"`
+	Category string `yaml:"category"`
+
+	// Fetching — how to retrieve listing pages.
+	Fetching `yaml:",inline"`
+
+	// Parsing — how to extract products from the response.
+	Parsing `yaml:",inline"`
+
+	// Pricing — price adjustment, secondary API, and currency.
+	Pricing `yaml:",inline"`
+
+	// Output — how to construct product URLs.
+	Output `yaml:",inline"`
+}
+
+// Fetching controls how listing pages are retrieved.
+type Fetching struct {
+	URL          string     `yaml:"url"`
+	URLs         []string   `yaml:"urls"`
+	BodyTemplate string     `yaml:"body_template"`
+	MaxPages     int        `yaml:"max_pages"`
+	Pagination   Pagination `yaml:"pagination"`
+}
+
+// Parsing controls how products are extracted from the response.
+type Parsing struct {
 	Selectors     map[string]string `yaml:"selectors"`
 	Fields        map[string]string `yaml:"fields"`
 	JSONSelector  string            `yaml:"json_selector"`
-	PriceDivisor  float64           `yaml:"price_divisor"`
-	PriceAPI      *PriceAPI         `yaml:"price_api"`
 	JSONPCallback string            `yaml:"jsonp_callback"`
-	URLTemplate   string            `yaml:"url_template"`
-	Currency      string            `yaml:"currency"`
+}
+
+// Pricing controls price adjustment, enrichment, and currency.
+type Pricing struct {
+	PriceDivisor float64   `yaml:"price_divisor"`
+	PriceAPI     *PriceAPI `yaml:"price_api"`
+	Currency     string    `yaml:"currency"`
+}
+
+// Output controls how product URLs are constructed.
+type Output struct {
+	URLTemplate string `yaml:"url_template"`
 }
 
 // PriceAPI defines a secondary API call to fetch prices for products.

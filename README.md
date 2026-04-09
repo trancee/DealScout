@@ -247,14 +247,21 @@ export TELEGRAM_CHANNEL="-1001234567890"
 #### Step 7: Test the connection
 
 ```bash
-# Dry run — finds deals but doesn't send notifications
-./dealscout --config ./config/ --dry-run
+# Send a test message to each configured topic
+./dealscout --test-telegram
+```
 
-# Seed the database first (no notifications)
-./dealscout --config ./config/ --seed
+You should see a `✅ DealScout test message` appear in each Forum Topic. If any topic fails, the error will tell you which one and why.
+
+```bash
+# Then seed the database (no notifications)
+./dealscout --seed
+
+# Dry run — finds deals but doesn't send notifications
+./dealscout --dry-run
 
 # Full run — sends notifications to Telegram
-./dealscout --config ./config/
+./dealscout
 ```
 
 > **Tip:** Always run `--seed` first to populate the database without flooding the channel. After seeding, only new products and price drops will trigger notifications.
@@ -264,26 +271,42 @@ export TELEGRAM_CHANNEL="-1001234567890"
 | Problem | Solution |
 |---------|----------|
 | `telegram credentials missing` | Check `secrets.yaml` exists or env vars are set |
-| `sendPhoto returned 403` | Bot is not an admin in the group |
-| `sendPhoto returned 400` | Invalid `message_thread_id` — verify topic IDs |
+| `sendPhoto 403: ...` or `sendMessage 403: ...` | Bot is not an admin in the group — check the error description |
+| `sendMessage 400: ...` | Invalid `message_thread_id` — verify topic IDs |
+| Proxy blocking Telegram API | Set `proxy` in `settings.yaml` (see below) |
 | Notifications go to General instead of a topic | The topic ID is `0` or missing in `telegram_topics` |
 | Image not showing | Telegram couldn't fetch the image URL — falls back to text-only `sendMessage` |
 | Duplicate notifications | Check `notification_cooldown_hours` in `settings.yaml` (default: 24h) |
+
+#### Using a proxy
+
+If your network blocks access to the Telegram API, add a proxy to `config/settings.yaml`:
+
+```yaml
+# HTTP, HTTPS, or SOCKS5 proxy for Telegram API requests
+proxy: "socks5://127.0.0.1:1080"
+# proxy: "http://proxy.example.com:8080"
+```
+
+The proxy is used only for Telegram notifications, not for shop fetching.
 
 ## Usage
 
 ```bash
 # Full run
-./dealscout --config ./config/
+./dealscout
 
 # Initial DB population — stores products, sends zero notifications
-./dealscout --config ./config/ --seed
+./dealscout --seed
 
 # Test run — full pipeline, logs deals, doesn't post to Telegram
-./dealscout --config ./config/ --dry-run
+./dealscout --dry-run
 
 # Single shop only
-./dealscout --config ./config/ --shop "Galaxus"
+./dealscout --shop "Brack"
+
+# Test Telegram connection — sends a message to each topic
+./dealscout --test-telegram
 ```
 
 ### Cron setup

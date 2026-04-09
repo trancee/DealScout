@@ -22,7 +22,8 @@ func sendNotifications(deals []deal.Deal, cfg *config.Config, db *storage.Databa
 		return
 	}
 
-	n := notifier.New(cfg.Secrets.TelegramBotToken, cfg.Secrets.TelegramChannel, cfg.Settings.TelegramTopics)
+	n := notifier.New(cfg.Secrets.TelegramBotToken, cfg.Secrets.TelegramChannel, cfg.Settings.TelegramTopics).
+		WithProxy(cfg.Settings.Proxy)
 	for _, d := range deals {
 		if err := n.Send(d); err != nil {
 			slog.Error("notification failed", "product", d.ProductName, "error", err)

@@ -20,6 +20,7 @@ type Settings struct {
 	ExchangeRateCacheTTLHours int            `yaml:"exchange_rate_cache_ttl_hours"`
 	LogLevel                  string         `yaml:"log_level"`
 	LogFormat                 string         `yaml:"log_format"`
+	Proxy                     string         `yaml:"proxy"`
 	DatabasePath              string         `yaml:"database_path"`
 	DumpDir                   string         `yaml:"dump_dir"`
 	CacheDir                  string         `yaml:"cache_dir"`

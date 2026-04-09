@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/trancee/DealScout/internal/config"
+	"github.com/trancee/DealScout/internal/notifier"
 	"github.com/trancee/DealScout/internal/pipeline"
 	"github.com/trancee/DealScout/internal/storage"
 )
@@ -16,6 +17,7 @@ func main() {
 	seed := flag.Bool("seed", false, "Populate DB without sending notifications")
 	dryRun := flag.Bool("dry-run", false, "Full pipeline, log deals, don't notify")
 	shopFilter := flag.String("shop", "", "Run only the named shop")
+	testTelegram := flag.Bool("test-telegram", false, "Send a test message to each Telegram topic and exit")
 	flag.Parse()
 
 	cfg, err := config.Load(*configDir)
@@ -25,6 +27,20 @@ func main() {
 	}
 
 	initLogger(cfg.Settings.LogLevel, cfg.Settings.LogFormat)
+
+	if *testTelegram {
+		n := notifier.New(cfg.Secrets.TelegramBotToken, cfg.Secrets.TelegramChannel, cfg.Settings.TelegramTopics).
+			WithProxy(cfg.Settings.Proxy)
+		sent, err := n.SendTestMessage()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		}
+		fmt.Printf("Test messages sent: %d/%d topics\n", sent, max(len(cfg.Settings.TelegramTopics), 1))
+		if sent == 0 {
+			os.Exit(1)
+		}
+		return
+	}
 
 	slog.Info("config loaded",
 		"shops", len(cfg.Shops),

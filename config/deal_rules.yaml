@@ -1,19 +1,19 @@
-smartphone:
+smartphones:
   min_price: 50
   max_price: 150
   min_discount_pct: 10
 
-laptop:
+laptops:
   min_price: 400
   max_price: 1200
   min_discount_pct: 15
 
-headphone:
+headphones:
   min_price: 20
   max_price: 200
   min_discount_pct: 5
 
-monitor:
+monitors:
   min_price: 400
   max_price: 1200
   min_discount_pct: 15

@@ -56,7 +56,7 @@ func TestDryRunFindsDeals(t *testing.T) {
 				SourceType: "html",
 				Categories: []config.ShopCategory{
 					{
-						Category: "smartphone",
+						Category: "smartphones",
 						Fetching: config.Fetching{URL: server.URL, MaxPages: 1},
 						Parsing: config.Parsing{
 							Selectors: map[string]string{
@@ -73,7 +73,7 @@ func TestDryRunFindsDeals(t *testing.T) {
 			},
 		},
 		DealRules: map[string]config.DealRule{
-			"smartphone": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10},
+			"smartphones": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10},
 		},
 		Filters: map[string]config.Filter{},
 		Secrets: config.Secrets{TelegramBotToken: "tok", TelegramChannel: "-1"},
@@ -113,7 +113,7 @@ func TestSeedStoresButNoDeals(t *testing.T) {
 				Name: "TestShop",
 				Categories: []config.ShopCategory{
 					{
-						Category: "smartphone",
+						Category: "smartphones",
 						Fetching: config.Fetching{URL: server.URL, MaxPages: 1},
 						Parsing: config.Parsing{
 							Selectors: map[string]string{
@@ -130,7 +130,7 @@ func TestSeedStoresButNoDeals(t *testing.T) {
 			},
 		},
 		DealRules: map[string]config.DealRule{
-			"smartphone": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10},
+			"smartphones": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10},
 		},
 		Filters: map[string]config.Filter{},
 		Secrets: config.Secrets{TelegramBotToken: "tok", TelegramChannel: "-1"},
@@ -156,7 +156,7 @@ func TestShopFilter(t *testing.T) {
 
 	db := mustOpenDB(t)
 	cat := config.ShopCategory{
-		Category: "smartphone",
+		Category: "smartphones",
 		Fetching: config.Fetching{URL: server.URL, MaxPages: 1},
 		Parsing:  config.Parsing{Selectors: map[string]string{"product_card": "div.product", "title": "h2 a span", "price": "span.price"}},
 		Pricing:  config.Pricing{Currency: "CHF"},
@@ -167,7 +167,7 @@ func TestShopFilter(t *testing.T) {
 			{Name: "ShopA", Categories: []config.ShopCategory{cat}},
 			{Name: "ShopB", Categories: []config.ShopCategory{cat}},
 		},
-		DealRules: map[string]config.DealRule{"smartphone": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10}},
+		DealRules: map[string]config.DealRule{"smartphones": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10}},
 		Filters:   map[string]config.Filter{},
 		Secrets:   config.Secrets{TelegramBotToken: "tok", TelegramChannel: "-1"},
 	}

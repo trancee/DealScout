@@ -4,7 +4,7 @@ shops:
     cleaner: "ackermann"
     base_url: "https://www.ackermann.ch"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         url: 'https://www.ackermann.ch/technik/multimedia/smartphones-telefone/?f={base64_start}{"filter_Kategorie":["fb_ktgr_mblt.fn_d8"],"filter_price":["{min_price}-{max_price}"]}{base64_end}&o=price-asc'
         max_pages: 1
         selectors:
@@ -26,7 +26,7 @@ shops:
       accept: "application/json"
       x-requested-with: "XMLHttpRequest"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         url: "https://alltron.ch/api/v1/catalog/search?path=%2Ftelco-ucc%2Fmobiltelefonie%2Fsmartphones&limit=48&page=1&sortProducts=priceasc&filters=availability%3A%3A%3AVerf%C3%BCgbar%7C%7C%7Cprice_standard%3A%3A%3A{min_price}~~~{max_price}&listView=listshop&searchEarlyFilter=true&format=json"
         max_pages: 1
         fields:
@@ -50,7 +50,7 @@ shops:
     cleaner: "amazon"
     base_url: "https://www.amazon.de"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         url: "https://www.amazon.de/s?k=smartphone&page={page}"
         max_pages: 3
         pagination:
@@ -80,7 +80,7 @@ shops:
   #     accept: "application/json"
   #     accept-language: "de-CH,de;q=0.9,en;q=0.8"
   #   categories:
-  #     - category: "smartphone"
+  #     - category: "smartphones"
   #       url: "https://www.galaxus.ch/api/graphql/product-type-filter-products"
   #       body_template: "templates/galaxus_smartphone.json"
   #       max_pages: 5
@@ -102,7 +102,7 @@ shops:
     cleaner: "brack"
     base_url: "https://www.brack.ch"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         url: "https://www.brack.ch/it-multimedia/handy-telefonie/smartphone-handy/smartphones?filter%5Bprice_standard%5D%5B%5D={min_price}~~~{max_price}&filter%5Bavailability%5D%5B%5D=Verf%C3%BCgbar&sortProducts=priceasc"
         max_pages: 1
         json_selector: "script#b2c-search-products"
@@ -125,7 +125,7 @@ shops:
     headers:
       content-type: "application/json"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         url: "https://api.conrad.ch/search/1/v3/facetSearch/ch/de/b2c?apikey=2cHbdksbmXc6PQDkPzRVFOcdladLvH7w"
         body_template: "templates/conrad_search.json"
         max_pages: 1
@@ -152,7 +152,7 @@ shops:
     cleaner: "foletti"
     base_url: "https://superstore.foletti.com"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         url: "https://superstore.foletti.com/de/categories/it--multimedia/telekommunikation/mobiltelefone/smartphone?price-min={min_price}&price-max={max_price}&limit=100&sort=price|asc&listStyle=list&page={page}"
         max_pages: 3
         pagination:
@@ -179,7 +179,7 @@ shops:
       referer: "https://www.interdiscount.ch/"
       origin: "https://www.interdiscount.ch"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         url: "https://www.interdiscount.ch/idocc/occ/id/products/search?currentPage=0&pageSize=100&query=:price-asc:categoryPath:/1/400/4100:categoryPath:/1/400/4100/411000:price_min:{min_price}:price_max:{max_price}:producttype411001k:Smartphone&lang=de"
         max_pages: 1
         fields:
@@ -197,7 +197,7 @@ shops:
     headers:
       accept: "application/json"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         urls:
           - "https://hopcash.ch/214-iphone?q=Prix-CHF-{min_price}-{max_price}&order=product.price.asc&page={page}&from-xhr"
           - "https://hopcash.ch/263-samsung?q=Prix-CHF-{min_price}-{max_price}&order=product.price.asc&page={page}&from-xhr"
@@ -219,7 +219,7 @@ shops:
     cleaner: "mediamarkt"
     base_url: "https://www.mediamarkt.ch"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         url: "https://www.mediamarkt.ch/de/category/smartphone-680815.html?filter=currentprice:{min_price}-{max_price}&sort=currentprice+asc&page={page}"
         max_pages: 5
         pagination:
@@ -239,7 +239,7 @@ shops:
     source_type: "json"
     cleaner: "mobilezone"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         url: "https://search.epoq.de/inbound-servletapi/getSearchResult?full&ff=e:alloc_THEME&fv=Mobilegeraete_Alle_Handys&ff=g:price&fv=>{min_price}&ff=g:price&fv=<{max_price}&ff=e:isPriceVariant&fv=0&ff=e:isPriceVariant&fv=0&callback=X&tenantId=mobilezone-ch-2019&sessionId=7a8ffbd5f43f44f3946dd642a0e86a7&orderBy=e:sorting_price&order=asc&limit=100&offset=0&locakey=de-CH&style=compact&format=json&query="
         max_pages: 1
         jsonp_callback: "X"
@@ -256,7 +256,7 @@ shops:
     cleaner: "orderflow"
     base_url: "https://www.orderflow.ch"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         url: "https://www.orderflow.ch/de/categories/elektronik/kommunikation/mobiltelefone?price-min={min_price}&price-max={max_price}&limit=100&sort=price%7Casc&c300101=%5B30010117%2C30010105%2C30010104%5D&page={page}"
         max_pages: 3
         pagination:

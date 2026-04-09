@@ -1,9 +1,9 @@
-smartphone:
+smartphones:
   min_price: 50
   max_price: 350
   min_discount_pct: 10
 
-laptop:
+laptops:
   min_price: 400
   max_price: 1200
   min_discount_pct: 15

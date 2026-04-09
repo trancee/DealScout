@@ -75,11 +75,11 @@ func TestTransformProductFiltered(t *testing.T) {
 func TestEvaluateProductDeal(t *testing.T) {
 	db := mustOpenDB(t)
 	rules := map[string]config.DealRule{
-		"smartphone": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10},
+		"smartphones": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10},
 	}
 	eval := deal.NewEvaluator(db, rules, 24)
 	shop := config.Shop{Name: "TestShop"}
-	cat := config.ShopCategory{Category: "smartphone", Pricing: config.Pricing{Currency: "CHF"}}
+	cat := config.ShopCategory{Category: "smartphones", Pricing: config.Pricing{Currency: "CHF"}}
 
 	p := parser.RawProduct{Title: "Test Phone", Price: 149.0, URL: "https://example.com"}
 
@@ -99,11 +99,11 @@ func TestEvaluateProductDeal(t *testing.T) {
 func TestEvaluateProductSeedMode(t *testing.T) {
 	db := mustOpenDB(t)
 	rules := map[string]config.DealRule{
-		"smartphone": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10},
+		"smartphones": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10},
 	}
 	eval := deal.NewEvaluator(db, rules, 24)
 	shop := config.Shop{Name: "TestShop"}
-	cat := config.ShopCategory{Category: "smartphone", Pricing: config.Pricing{Currency: "CHF"}}
+	cat := config.ShopCategory{Category: "smartphones", Pricing: config.Pricing{Currency: "CHF"}}
 
 	p := parser.RawProduct{Title: "Test Phone", Price: 149.0}
 

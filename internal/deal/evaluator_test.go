@@ -20,7 +20,7 @@ func mustOpenDB(t *testing.T) *storage.Database {
 
 func defaultRules() map[string]config.DealRule {
 	return map[string]config.DealRule{
-		"smartphone": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10},
+		"smartphones": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10},
 	}
 }
 
@@ -28,7 +28,7 @@ func TestFirstSeenInRange(t *testing.T) {
 	db := mustOpenDB(t)
 	ev := deal.NewEvaluator(db, defaultRules(), 24)
 
-	result := ev.Evaluate("Samsung Galaxy A15", "smartphone", "Galaxus", 149.0, nil, "https://example.com/1", "https://img.com/1.jpg")
+	result := ev.Evaluate("Samsung Galaxy A15", "smartphones", "Galaxus", 149.0, nil, "https://example.com/1", "https://img.com/1.jpg")
 
 	if result.Deal == nil {
 		t.Fatalf("expected deal, got skipped: %s", result.Reason)
@@ -46,13 +46,13 @@ func TestFirstSeenOutOfRange(t *testing.T) {
 	ev := deal.NewEvaluator(db, defaultRules(), 24)
 
 	// Price above max.
-	result := ev.Evaluate("iPhone 16 Pro", "smartphone", "Galaxus", 999.0, nil, "url", "img")
+	result := ev.Evaluate("iPhone 16 Pro", "smartphones", "Galaxus", 999.0, nil, "url", "img")
 	if result.Deal != nil {
 		t.Error("should not be a deal — price above max")
 	}
 
 	// Price below min.
-	result2 := ev.Evaluate("Cheap Phone", "smartphone", "Galaxus", 10.0, nil, "url", "img")
+	result2 := ev.Evaluate("Cheap Phone", "smartphones", "Galaxus", 10.0, nil, "url", "img")
 	if result2.Deal != nil {
 		t.Error("should not be a deal — price below min")
 	}
@@ -63,10 +63,10 @@ func TestReturningProductSufficientDiscount(t *testing.T) {
 	ev := deal.NewEvaluator(db, defaultRules(), 24)
 
 	// First evaluation — first seen, in range, is a deal.
-	ev.Evaluate("Samsung Galaxy A15", "smartphone", "Galaxus", 300.0, nil, "url", "img")
+	ev.Evaluate("Samsung Galaxy A15", "smartphones", "Galaxus", 300.0, nil, "url", "img")
 
 	// Second evaluation — price dropped 17% (300 → 249), should be deal.
-	result := ev.Evaluate("Samsung Galaxy A15", "smartphone", "Galaxus", 249.0, nil, "url", "img")
+	result := ev.Evaluate("Samsung Galaxy A15", "smartphones", "Galaxus", 249.0, nil, "url", "img")
 	if result.Deal == nil {
 		t.Fatalf("expected deal on price drop, got skipped: %s", result.Reason)
 	}
@@ -83,10 +83,10 @@ func TestReturningProductInsufficientDiscount(t *testing.T) {
 	ev := deal.NewEvaluator(db, defaultRules(), 24)
 
 	// First evaluation.
-	ev.Evaluate("Samsung Galaxy A15", "smartphone", "Galaxus", 300.0, nil, "url", "img")
+	ev.Evaluate("Samsung Galaxy A15", "smartphones", "Galaxus", 300.0, nil, "url", "img")
 
 	// Second evaluation — price dropped only 3% (300 → 290), below min_discount_pct.
-	result := ev.Evaluate("Samsung Galaxy A15", "smartphone", "Galaxus", 290.0, nil, "url", "img")
+	result := ev.Evaluate("Samsung Galaxy A15", "smartphones", "Galaxus", 290.0, nil, "url", "img")
 	if result.Deal != nil {
 		t.Error("should not be deal — insufficient discount")
 	}
@@ -97,7 +97,7 @@ func TestSanityBoundsViolation(t *testing.T) {
 	ev := deal.NewEvaluator(db, defaultRules(), 24)
 
 	// Price outside [min*0.1, max*10] = [5, 3500].
-	result := ev.Evaluate("Bug Phone", "smartphone", "Galaxus", 0.01, nil, "url", "img")
+	result := ev.Evaluate("Bug Phone", "smartphones", "Galaxus", 0.01, nil, "url", "img")
 	if result.Deal != nil {
 		t.Error("should reject — below sanity bound")
 	}
@@ -105,7 +105,7 @@ func TestSanityBoundsViolation(t *testing.T) {
 		t.Errorf("Reason = %q, want %q", result.Reason, "sanity")
 	}
 
-	result2 := ev.Evaluate("Mega Phone", "smartphone", "Galaxus", 5000.0, nil, "url", "img")
+	result2 := ev.Evaluate("Mega Phone", "smartphones", "Galaxus", 5000.0, nil, "url", "img")
 	if result2.Deal != nil {
 		t.Error("should reject — above sanity bound")
 	}
@@ -129,19 +129,19 @@ func TestCooldownDedup(t *testing.T) {
 	ev := deal.NewEvaluator(db, defaultRules(), 24)
 
 	// First evaluation — first seen, deal.
-	result := ev.Evaluate("Samsung Galaxy A15", "smartphone", "Galaxus", 149.0, nil, "url", "img")
+	result := ev.Evaluate("Samsung Galaxy A15", "smartphones", "Galaxus", 149.0, nil, "url", "img")
 	if result.Deal == nil {
 		t.Fatal("first evaluation should be a deal")
 	}
 
 	// Record the notification.
-	id, _, _ := db.UpsertProduct("Samsung Galaxy A15", "smartphone")
+	id, _, _ := db.UpsertProduct("Samsung Galaxy A15", "smartphones")
 	_ = db.RecordNotification(id, "Galaxus", 149.0)
 
 	// Third evaluation — new product+shop (first seen) but cooldown blocks it.
 	// We need a different shop to trigger first-seen again on same product.
 	_ = db.RecordNotification(id, "Amazon", 140.0)
-	result2 := ev.Evaluate("Samsung Galaxy A15", "smartphone", "Amazon", 140.0, nil, "url", "img")
+	result2 := ev.Evaluate("Samsung Galaxy A15", "smartphones", "Amazon", 140.0, nil, "url", "img")
 	if result2.Deal != nil {
 		t.Error("should be skipped — within cooldown")
 	}

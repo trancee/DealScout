@@ -4,7 +4,7 @@ shops:
     method: "POST"
     cleaner: "galaxus"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         url: "https://www.galaxus.ch/api/graphql/product-type-filter-products"
         body_template: "templates/galaxus_smartphone.json"
         max_pages: 5
@@ -25,7 +25,7 @@ shops:
     cleaner: "amazon"
     base_url: "https://www.amazon.de"
     categories:
-      - category: "smartphone"
+      - category: "smartphones"
         url: "https://www.amazon.de/s?k=smartphone&page={page}"
         max_pages: 3
         pagination:

@@ -56,20 +56,20 @@ func TestLoadValidConfig(t *testing.T) {
 	if len(cfg.DealRules) != 2 {
 		t.Fatalf("len(DealRules) = %d, want 2", len(cfg.DealRules))
 	}
-	sp := cfg.DealRules["smartphone"]
+	sp := cfg.DealRules["smartphones"]
 	if sp.MinPrice != 50 {
-		t.Errorf("smartphone MinPrice = %f, want 50", sp.MinPrice)
+		t.Errorf("smartphones MinPrice = %f, want 50", sp.MinPrice)
 	}
 	if sp.MinDiscountPct != 10 {
-		t.Errorf("smartphone MinDiscountPct = %f, want 10", sp.MinDiscountPct)
+		t.Errorf("smartphones MinDiscountPct = %f, want 10", sp.MinDiscountPct)
 	}
 
 	// Filters
 	if len(cfg.Filters) != 2 {
 		t.Fatalf("len(Filters) = %d, want 2", len(cfg.Filters))
 	}
-	if len(cfg.Filters["smartphone"].SkipBrands) != 2 {
-		t.Errorf("smartphone SkipBrands count = %d, want 2", len(cfg.Filters["smartphone"].SkipBrands))
+	if len(cfg.Filters["smartphones"].SkipBrands) != 2 {
+		t.Errorf("smartphones SkipBrands count = %d, want 2", len(cfg.Filters["smartphones"].SkipBrands))
 	}
 
 	// Secrets

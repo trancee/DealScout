@@ -8,7 +8,12 @@ laptop:
   max_price: 1200
   min_discount_pct: 15
 
-headphones:
+headphone:
   min_price: 20
   max_price: 200
   min_discount_pct: 5
+
+monitor:
+  min_price: 400
+  max_price: 1200
+  min_discount_pct: 15

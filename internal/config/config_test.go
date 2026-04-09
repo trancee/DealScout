@@ -24,7 +24,7 @@ func TestLoadValidConfig(t *testing.T) {
 	if cfg.Settings.FetchDelaySeconds != 2 {
 		t.Errorf("FetchDelaySeconds = %d, want %d", cfg.Settings.FetchDelaySeconds, 2)
 	}
-	wantDBPath := filepath.Join("testdata/valid", "data/dealscout.db")
+	wantDBPath := "data/dealscout.db"
 	if cfg.Settings.DatabasePath != wantDBPath {
 		t.Errorf("DatabasePath = %q, want %q", cfg.Settings.DatabasePath, wantDBPath)
 	}
@@ -173,8 +173,8 @@ func TestPathResolution(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// Database path resolved relative to config dir.
-	wantDB := filepath.Join("testdata/valid", "data/dealscout.db")
+	// Database path stays relative to working directory.
+	wantDB := "data/dealscout.db"
 	if cfg.Settings.DatabasePath != wantDB {
 		t.Errorf("DatabasePath = %q, want %q", cfg.Settings.DatabasePath, wantDB)
 	}

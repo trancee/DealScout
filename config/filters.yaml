@@ -14,4 +14,4 @@ smartphone:
 
 laptop:
   skip_brands: []
-  exclusion_regex: "(?i)Tasche|Sleeve"
+  exclusion_regex: (?i)Tasche|Sleeve

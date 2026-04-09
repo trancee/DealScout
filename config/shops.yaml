@@ -5,8 +5,7 @@ shops:
     base_url: "https://www.ackermann.ch"
     categories:
       - category: "smartphone"
-        # url: "https://www.ackermann.ch/technik/multimedia/smartphones-telefone/?f=eyJmaWx0ZXJfUHJvZHVrdHR5cF8xIjpbImZiX3ByZGt0LnAxX3NtcnQuaG5fMzgiXSwiZmlsdGVyX3ByaWNlIjpbIjUwLTM1MCJdfQ%3D%3D&o=price-asc"
-        url: "https://www.ackermann.ch/technik/multimedia/smartphones-telefone/?f=eyJmaWx0ZXJfS2F0ZWdvcmllIjpbImZiX2t0Z3JfbWJsdC5mbl9kOCJdLCJmaWx0ZXJfcHJpY2UiOlsiNjAtMTUwIl19&o=price-asc"
+        url: 'https://www.ackermann.ch/technik/multimedia/smartphones-telefone/?f={base64_start}{"filter_Kategorie":["fb_ktgr_mblt.fn_d8"],"filter_price":["{min_price}-{max_price}"]}{base64_end}&o=price-asc'
         max_pages: 1
         selectors:
           product_card: "li.product-card"
@@ -76,7 +75,7 @@ shops:
     base_url: "https://www.brack.ch"
     categories:
       - category: "smartphone"
-        url: "https://www.brack.ch/it-multimedia/smartphone?filter%5Bavailability%5D%5B%5D=Verf%C3%BCgbar&filter%5Bprice_standard%5D%5B%5D=50~~~350&sortProducts=priceasc&query=*"
+        url: "https://www.brack.ch/it-multimedia/handy-telefonie/smartphone-handy/smartphones?filter%5Bprice_standard%5D%5B%5D={min_price}~~~{max_price}&filter%5Bavailability%5D%5B%5D=Verf%C3%BCgbar&sortProducts=priceasc"
         max_pages: 1
         json_selector: "script#b2c-search-products"
         price_divisor: 100
@@ -107,6 +106,7 @@ shops:
           title: "title"
           url: "productId"
           image: "image"
+        url_template: "https://www.conrad.ch/de/p/-{id}.html"
         price_api:
           url: "https://api.conrad.ch/price-availability/4/CQ_CH_B2C/facade?apikey=2cHbdksbmXc6PQDkPzRVFOcdladLvH7w&forceStorePrice=false&overrideCalculationSchema=GROSS"
           body_template: "templates/conrad_prices.json"
@@ -125,7 +125,7 @@ shops:
     base_url: "https://superstore.foletti.com"
     categories:
       - category: "smartphone"
-        url: "https://superstore.foletti.com/de/categories/it--multimedia/telekommunikation/mobiltelefone/smartphone?price-min=50&price-max=350&limit=100&sort=price|asc&listStyle=list&page={page}"
+        url: "https://superstore.foletti.com/de/categories/it--multimedia/telekommunikation/mobiltelefone/smartphone?price-min={min_price}&price-max={max_price}&limit=100&sort=price|asc&listStyle=list&page={page}"
         max_pages: 3
         pagination:
           type: "page_param"
@@ -152,7 +152,7 @@ shops:
       origin: "https://www.interdiscount.ch"
     categories:
       - category: "smartphone"
-        url: "https://www.interdiscount.ch/idocc/occ/id/products/search?currentPage=0&pageSize=100&query=:price-asc:categoryPath:/1/400/4100:categoryPath:/1/400/4100/411000:price_min:50:price_max:350:producttype411001k:Smartphone&lang=de"
+        url: "https://www.interdiscount.ch/idocc/occ/id/products/search?currentPage=0&pageSize=100&query=:price-asc:categoryPath:/1/400/4100:categoryPath:/1/400/4100/411000:price_min:{min_price}:price_max:{max_price}:producttype411001k:Smartphone&lang=de"
         max_pages: 1
         fields:
           products: "products"
@@ -168,7 +168,7 @@ shops:
     base_url: "https://www.mediamarkt.ch"
     categories:
       - category: "smartphone"
-        url: "https://www.mediamarkt.ch/de/category/smartphone-680815.html?filter=currentprice:50-350&sort=currentprice+asc&page={page}"
+        url: "https://www.mediamarkt.ch/de/category/smartphone-680815.html?filter=currentprice:{min_price}-{max_price}&sort=currentprice+asc&page={page}"
         max_pages: 5
         pagination:
           type: "page_param"
@@ -205,7 +205,7 @@ shops:
     base_url: "https://www.orderflow.ch"
     categories:
       - category: "smartphone"
-        url: "https://www.orderflow.ch/de/categories/elektronik/kommunikation/mobiltelefone?price-min=50&price-max=350&limit=100&sort=price|asc&c300101=30010104,30010117,30010105,30010103&page={page}"
+        url: "https://www.orderflow.ch/de/categories/elektronik/kommunikation/mobiltelefone?price-min={min_price}&price-max={max_price}&limit=100&sort=price|asc&c300101=30010104,30010117,30010105,30010103&page={page}"
         max_pages: 3
         pagination:
           type: "page_param"

@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/trancee/DealScout/internal/config"
 )
@@ -21,5 +22,17 @@ func Parse(shopCat config.ShopCategory, data []byte, baseURL string) ([]RawProdu
 		return ParseJSON(data, shopCat.Fields)
 	default:
 		return nil, fmt.Errorf("shop category %q has neither selectors nor fields configured", shopCat.Category)
+	}
+}
+
+// ResolveProductURLs resolves relative product URLs against a base URL.
+// If urlTemplate is set, it replaces {id} with the product's URL field value.
+func ResolveProductURLs(products []RawProduct, baseURL, urlTemplate string) {
+	for i := range products {
+		if urlTemplate != "" {
+			products[i].URL = strings.ReplaceAll(urlTemplate, "{id}", products[i].URL)
+		} else if baseURL != "" {
+			products[i].URL = resolveURL(products[i].URL, baseURL)
+		}
 	}
 }

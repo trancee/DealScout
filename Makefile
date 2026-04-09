@@ -15,6 +15,7 @@ build:
 
 clean:
 	rm -f $(BINARY)
+	rm -rf data/cache data/dumps
 
 test:
 	go test -race ./...

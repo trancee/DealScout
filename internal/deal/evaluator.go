@@ -40,6 +40,11 @@ type Result struct {
 	Reason  string
 }
 
+// Rules returns the deal rules map.
+func (e *Evaluator) Rules() map[string]config.DealRule {
+	return e.rules
+}
+
 // Evaluate checks if a product qualifies as a deal.
 // It stores the product and price history regardless of deal outcome.
 func (e *Evaluator) Evaluate(cleanedName, category, shop string, priceCHF float64, oldPrice *float64, url, imageURL string) Result {

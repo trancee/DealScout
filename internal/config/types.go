@@ -53,6 +53,7 @@ type ShopCategory struct {
 	PriceDivisor  float64           `yaml:"price_divisor"`
 	PriceAPI      *PriceAPI         `yaml:"price_api"`
 	JSONPCallback string            `yaml:"jsonp_callback"`
+	URLTemplate   string            `yaml:"url_template"`
 	Currency      string            `yaml:"currency"`
 }
 

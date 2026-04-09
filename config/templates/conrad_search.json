@@ -3,7 +3,7 @@
   "enabledFeatures": ["and_filters"],
   "disabledFeatures": [],
   "globalFilter": [{"field": "categoryId", "type": "TERM_OR", "values": "1801015"}],
-  "facetFilter": [{"field": "price", "type": "RANGE", "values": [50, 350]}],
+  "facetFilter": [{"field": "price", "type": "RANGE", "values": [{min_price}, {max_price}]}],
   "sort": [{"field": "price", "order": "asc"}],
   "from": 0,
   "size": 200,

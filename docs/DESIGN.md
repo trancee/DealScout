@@ -761,3 +761,7 @@ Run: `go test ./...`
 | 57 | Orderflow shop | HTML parsing (same platform as Foletti), expanded accessory exclusion filter |
 | 58 | Response dump | Each shop fetch is saved to `dump_dir/<shop>/<category>.<page>.txt` with curl command header; cleared per shop on each run |
 | 59 | Response cache | File-based TTL cache (`cache_dir`, default 25 min) skips HTTP fetches when fresh cached response exists |
+| 60 | Dynamic price placeholders | `{min_price}`, `{max_price}` in URLs and templates resolved from deal rules; `{base64_start}...{base64_end}` for encoded filters |
+| 61 | Data directory at root | `data/` lives at project root (CWD), not under config dir |
+| 62 | URL resolution after enrichment | Product URLs resolved after price enrichment to avoid corrupting IDs used by secondary APIs |
+| 63 | URL template | `url_template` with `{id}` placeholder for shops with custom product URL patterns (e.g., Conrad) |

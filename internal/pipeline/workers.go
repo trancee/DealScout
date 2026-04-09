@@ -2,9 +2,11 @@ package pipeline
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"log/slog"
 	"os"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -59,13 +61,14 @@ func processShop(shop config.Shop, f *fetcher.Fetcher, conv *currency.Converter,
 	shopClean := cleaners.ShopCleaner(shop.Cleaner)
 
 	for _, cat := range shop.Categories {
+		cat, priceReplacements := resolvePricePlaceholders(cat, eval.Rules())
 		catFilter := buildFilter(cat.Category, filters)
 
 		for page := range cat.MaxPages {
 			data, cached := cache.get(shop.Name, cat.Category, page)
 			if !cached {
 				var err error
-				data, err = fetchPage(f, shop, cat, page)
+				data, err = fetchPage(f, shop, cat, page, priceReplacements)
 				if err != nil {
 					slog.Error("fetch failed", "shop", shop.Name, "category", cat.Category, "page", page, "error", err)
 					errors++
@@ -75,7 +78,7 @@ func processShop(shop config.Shop, f *fetcher.Fetcher, conv *currency.Converter,
 			}
 
 			dumpResponse(dumpDir, shop.Name, cat.Category, page,
-				fetchMethod(cat), buildRequestURL(cat, page), shop.Headers, fetchBody(cat, page), data)
+				fetchMethod(cat), buildRequestURL(cat, page), shop.Headers, fetchBody(cat, page, priceReplacements), data)
 
 			if cat.JSONPCallback != "" {
 				data = stripJSONP(data, cat.JSONPCallback)
@@ -91,6 +94,8 @@ func processShop(shop config.Shop, f *fetcher.Fetcher, conv *currency.Converter,
 			if cat.PriceAPI != nil {
 				rawProducts = enrichPrices(rawProducts, cat.PriceAPI, f, cat, shop, dumpDir, cache)
 			}
+
+			parser.ResolveProductURLs(rawProducts, shop.BaseURL, cat.URLTemplate)
 
 			for _, p := range rawProducts {
 				products++
@@ -143,7 +148,7 @@ func processShop(shop config.Shop, f *fetcher.Fetcher, conv *currency.Converter,
 	return deals, evaluated, products, errors
 }
 
-func fetchPage(f *fetcher.Fetcher, shop config.Shop, cat config.ShopCategory, page int) ([]byte, error) {
+func fetchPage(f *fetcher.Fetcher, shop config.Shop, cat config.ShopCategory, page int, priceReplacements map[string]string) ([]byte, error) {
 	switch cat.Pagination.Type {
 	case "offset":
 		offset := page * cat.Pagination.PerPage
@@ -152,6 +157,9 @@ func fetchPage(f *fetcher.Fetcher, shop config.Shop, cat config.ShopCategory, pa
 			return nil, fmt.Errorf("loading template %s: %w", cat.BodyTemplate, err)
 		}
 		replacements := map[string]string{"{offset}": fmt.Sprintf("%d", offset)}
+		for k, v := range priceReplacements {
+			replacements[k] = v
+		}
 		return f.Post(cat.URL, string(tpl), replacements, shop.Headers)
 	case "page_param":
 		pageNum := cat.Pagination.Start + page
@@ -163,7 +171,7 @@ func fetchPage(f *fetcher.Fetcher, shop config.Shop, cat config.ShopCategory, pa
 			if err != nil {
 				return nil, fmt.Errorf("loading template %s: %w", cat.BodyTemplate, err)
 			}
-			return f.Post(cat.URL, string(tpl), nil, shop.Headers)
+			return f.Post(cat.URL, string(tpl), priceReplacements, shop.Headers)
 		}
 		return f.Get(cat.URL, shop.Headers)
 	}
@@ -210,7 +218,7 @@ func fetchMethod(cat config.ShopCategory) string {
 	return "GET"
 }
 
-func fetchBody(cat config.ShopCategory, page int) string {
+func fetchBody(cat config.ShopCategory, page int, priceReplacements map[string]string) string {
 	if cat.BodyTemplate == "" {
 		return ""
 	}
@@ -223,5 +231,35 @@ func fetchBody(cat config.ShopCategory, page int) string {
 		offset := page * cat.Pagination.PerPage
 		body = strings.ReplaceAll(body, "{offset}", fmt.Sprintf("%d", offset))
 	}
+	for k, v := range priceReplacements {
+		body = strings.ReplaceAll(body, k, v)
+	}
 	return body
+}
+
+var base64PlaceholderRe = regexp.MustCompile(`\{base64_start\}(.*?)\{base64_end\}`)
+
+func resolvePricePlaceholders(cat config.ShopCategory, rules map[string]config.DealRule) (config.ShopCategory, map[string]string) {
+	replacements := map[string]string{}
+	rule, ok := rules[cat.Category]
+	if !ok {
+		return cat, replacements
+	}
+
+	minPrice := fmt.Sprintf("%.0f", rule.MinPrice)
+	maxPrice := fmt.Sprintf("%.0f", rule.MaxPrice)
+
+	replacements["{min_price}"] = minPrice
+	replacements["{max_price}"] = maxPrice
+
+	r := strings.NewReplacer("{min_price}", minPrice, "{max_price}", maxPrice)
+	cat.URL = r.Replace(cat.URL)
+
+	// Resolve {base64_start}...{base64_end} — encode inner content as base64.
+	cat.URL = base64PlaceholderRe.ReplaceAllStringFunc(cat.URL, func(match string) string {
+		inner := match[len("{base64_start}") : len(match)-len("{base64_end}")]
+		return base64.StdEncoding.EncodeToString([]byte(inner))
+	})
+
+	return cat, replacements
 }

@@ -39,7 +39,6 @@ func TestFormatCaptionFirstSeen(t *testing.T) {
 		Shop:        "Galaxus",
 		Price:       149.0,
 		URL:         "https://example.com/product",
-		ImageURL:    "https://img.com/1.jpg",
 		IsFirstSeen: true,
 	}
 
@@ -57,9 +56,9 @@ func TestFormatCaptionFirstSeen(t *testing.T) {
 	if !strings.Contains(caption, "View Product") {
 		t.Error("caption missing link")
 	}
-	// First-seen should NOT have discount line.
-	if strings.Contains(caption, "📉") {
-		t.Error("first-seen should not have discount line")
+	// First-seen with no old price — no strikethrough or discount.
+	if strings.Contains(caption, "~") {
+		t.Error("first-seen should not have strikethrough")
 	}
 }
 
@@ -79,14 +78,17 @@ func TestFormatCaptionWithDiscount(t *testing.T) {
 
 	caption := notifier.FormatCaption(d)
 
-	if !strings.Contains(caption, "📉") {
-		t.Error("caption missing discount line")
+	// Old price should be strikethrough.
+	if !strings.Contains(caption, "~") {
+		t.Error("caption missing strikethrough old price")
 	}
+	// Discount in parentheses on the price line.
 	if !strings.Contains(caption, "14%") {
 		t.Error("caption missing discount percentage")
 	}
-	if !strings.Contains(caption, "🏷️") {
-		t.Error("caption missing shop price line")
+	// All on the 💰 line.
+	if !strings.Contains(caption, "💰") {
+		t.Error("caption missing price line")
 	}
 }
 

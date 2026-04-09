@@ -135,22 +135,24 @@ func (n *Notifier) rateLimit() {
 // FormatCaption builds a MarkdownV2 caption for a deal notification.
 func FormatCaption(d deal.Deal) string {
 	name := EscapeMarkdownV2(d.ProductName)
-	price := EscapeMarkdownV2(fmt.Sprintf("CHF %.2f", d.Price))
 	shop := EscapeMarkdownV2(d.Shop)
 
 	var lines []string
 	lines = append(lines, fmt.Sprintf("🔥 %s", name))
-	lines = append(lines, fmt.Sprintf("💰 %s", price))
 
-	if !d.IsFirstSeen && d.DiscountPct > 0 {
-		drop := EscapeMarkdownV2(fmt.Sprintf("-%.0f%% (was CHF %.2f)", d.DiscountPct, d.LastDBPrice))
-		lines = append(lines, fmt.Sprintf("📉 %s", drop))
+	// Price line: current price, with strikethrough old price and discount if available.
+	priceLine := EscapeMarkdownV2(fmt.Sprintf("CHF %.2f", d.Price))
+	if d.OldPrice != nil && *d.OldPrice > d.Price {
+		oldPrice := EscapeMarkdownV2(fmt.Sprintf("CHF %.2f", *d.OldPrice))
+		priceLine = fmt.Sprintf("%s ~%s~", priceLine, oldPrice)
+	} else if !d.IsFirstSeen && d.LastDBPrice > d.Price {
+		oldPrice := EscapeMarkdownV2(fmt.Sprintf("CHF %.2f", d.LastDBPrice))
+		priceLine = fmt.Sprintf("%s ~%s~", priceLine, oldPrice)
 	}
-
-	if d.OldPrice != nil {
-		shopPrice := EscapeMarkdownV2(fmt.Sprintf("CHF %.2f", *d.OldPrice))
-		lines = append(lines, fmt.Sprintf("🏷️ Shop says: %s", shopPrice))
+	if d.DiscountPct > 0 {
+		priceLine = fmt.Sprintf("%s \\(\\-%.0f%%\\)", priceLine, d.DiscountPct)
 	}
+	lines = append(lines, fmt.Sprintf("💰 %s", priceLine))
 
 	lines = append(lines, fmt.Sprintf("🏪 %s", shop))
 

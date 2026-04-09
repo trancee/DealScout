@@ -134,7 +134,7 @@ shops:
         selectors:
           product_card: "div.item.card"
           title_prefix: "h4 a strong"
-          title: "span.productName a"
+          title: "img.img-fluid[alt]"
           price: "span.first_price span.price"
           old_price: "span.second_price span.price"
           url: "h4 a[href]"
@@ -214,7 +214,7 @@ shops:
         selectors:
           product_card: "div.item.card"
           title_prefix: "h4 a strong"
-          title: "span.productName a"
+          title: "img.img-fluid[alt]"
           price: "span.first_price span.price"
           old_price: "span.second_price span.price"
           url: "h4 a[href]"

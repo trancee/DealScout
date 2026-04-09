@@ -13,7 +13,7 @@ func TestNormalizeName(t *testing.T) {
 		{"APPLE IPHONE 8", "Apple iPhone 8"},
 		{"SAMSUNG Galaxy A16", "Samsung Galaxy A16"},
 		{"XIAOMI Redmi Note 14 Pro", "Xiaomi Redmi Note 14 Pro"},
-		{"samsung galaxy a16", "samsung galaxy a16"},
+		{"samsung galaxy a16", "Samsung Galaxy A16"},
 		{"Apple iPhone 16 Pro", "Apple iPhone 16 Pro"},
 		{"NOKIA 225", "Nokia 225"},
 		{"ONEPLUS Nord CE4 Lite", "OnePlus Nord CE4 Lite"},
@@ -21,10 +21,17 @@ func TestNormalizeName(t *testing.T) {
 		{"Google Pixel 9a", "Google Pixel 9a"},
 		{"HMD Arc", "HMD Arc"},
 		{"ZTE Blade V70", "ZTE Blade V70"},
+		{"ZTE Blade V70 Vita stone gray", "ZTE Blade V70 Vita"},
+		{"ZTE Blade V70 stardust gray", "ZTE Blade V70"},
+		{"Samsung Galaxy A17 A176", "Samsung Galaxy A17"},
 		{"Samsung Galaxy XCover 7 EE", "Samsung Galaxy XCover 7 EE"},
+		// {"Samsung SM-A175FZKBEUE", "Samsung Galaxy A17"},
 		{"  extra   spaces  ", "extra spaces"},
 		{"SONIM TECHNOLOGIES XP100", "Sonim Technologies XP100"},
 		{"CROSSCALL Core-S5", "Crosscall Core-S5"},
+
+		// realme
+		{"realme Note70T obsidian black", "realme Note 70T"},
 	}
 
 	for _, tt := range tests {

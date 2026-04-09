@@ -87,7 +87,7 @@ func cleanBrack(name string) string {
 	return strings.TrimSpace(name)
 }
 
-var conradSpecRe = regexp.MustCompile(`\s*[-,]\s+|\W\+\s+|EU |\d+\s*GB|\s*\d+G|\s+\(Version 20[12]\d\)|\s+\(Grade [A-Z]\)|\s+(((Senioren-|senior |Industrie |Outdoor )?Smartphone)|\s*CH$|Satellite|Ex-geschütztes Handy|Fusion( Holiday Edition)?|Refurbished|\(PRODUCT\) RED™|Weiß)`)
+var conradSpecRe = regexp.MustCompile(`\s*[-,]\s+|\W\+\s+|EU |\d+\s*[GM]B|\s*\d+G|\s+\(Version 20[12]\d\)|\s+\(Grade [A-Z]\)|\s+(((Senioren-|senior |Industrie |Outdoor )?Smartphone)|\s*CH$|Satellite|Ex-geschütztes Handy|Fusion( Holiday Edition)?|Refurbished|\(PRODUCT\) RED™|Weiß)`)
 
 func cleanConrad(name string) string {
 	name = strings.NewReplacer(
@@ -119,7 +119,7 @@ func cleanConrad(name string) string {
 var folettiSpecRe = regexp.MustCompile(`(?i)\s*[-,]+\s+|\s*\(?(\d+(\s*GB)?[+/])?\d+\s*GB\)?|\s*[45]G|(2|4|6|8|12)/(64|128|256?B?)(GB)?|\s+\(?20[12]\d\)?|\s*\d+([,.]\d+)?\s*(cm|inch|\")|\d{4,5}\s*mAh|\s+20[12]\d|\s+(Hybrid|Dual\W(SIM|Sim)|\s*CH( -|$)|inkl\.|LTE|NFC|smartphone)`)
 
 func cleanFoletti(name string) string {
-	name = strings.NewReplacer("Enterprise Edition", "EE", "Enterprise", "EE", "Renewd ", "", "SMARTPHONE ", "", "Smartphone ", "", "Smartfon ", "", "EU-Ware", "", "EU-Version", "", " schwarz", "").Replace(name)
+	name = strings.NewReplacer("Enterprise Edition", "EE", "Enterprise", "EE", "Renewd ", "", "SMARTPHONE ", "", "Smartphone ", "", "Smartfon ", "", "EU-Ware", "", "EU-Version", "", "Motorola Mobility", "").Replace(name)
 
 	if loc := folettiSpecRe.FindStringSubmatchIndex(name); loc != nil {
 		name = name[:loc[0]]

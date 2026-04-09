@@ -26,11 +26,11 @@ func ParseHTML(html []byte, selectors map[string]string, baseURL string) ([]RawP
 	var products []RawProduct
 
 	doc.Find(cardSel).Each(func(_ int, card *goquery.Selection) {
-		title := extractText(card, selectors["title"])
+		title := extractField(card, selectors["title"])
 		if title == "" {
 			return
 		}
-		if prefix := extractText(card, selectors["title_prefix"]); prefix != "" {
+		if prefix := extractField(card, selectors["title_prefix"]); prefix != "" {
 			if !strings.HasPrefix(strings.ToLower(title), strings.ToLower(prefix)) {
 				title = prefix + " " + title
 			}
@@ -66,6 +66,21 @@ func ParseHTML(html []byte, selectors map[string]string, baseURL string) ([]RawP
 func extractText(sel *goquery.Selection, cssSelector string) string {
 	if cssSelector == "" {
 		return ""
+	}
+	return strings.TrimSpace(sel.Find(cssSelector).First().Text())
+}
+
+// extractField extracts text from an element, or an attribute if the selector
+// ends with [attr] (e.g., "img.img-fluid[alt]" extracts the alt attribute).
+func extractField(sel *goquery.Selection, cssSelector string) string {
+	if cssSelector == "" {
+		return ""
+	}
+	if idx := strings.LastIndex(cssSelector, "["); idx > 0 && strings.HasSuffix(cssSelector, "]") {
+		attr := cssSelector[idx+1 : len(cssSelector)-1]
+		baseSel := cssSelector[:idx]
+		val, _ := sel.Find(baseSel).First().Attr(attr)
+		return strings.TrimSpace(val)
 	}
 	return strings.TrimSpace(sel.Find(cssSelector).First().Text())
 }

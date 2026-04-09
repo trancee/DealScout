@@ -5,7 +5,7 @@ max_retries: 3
 max_concurrent_shops: 5
 exchange_rate_provider: "https://api.frankfurter.app"
 exchange_rate_cache_ttl_hours: 24
-log_level: "DEBUG"            # DEBUG, INFO, WARNING, ERROR
+log_level: "INFO"            # DEBUG, INFO, WARNING, ERROR
 log_format: "text"           # text or json
 database_path: "data/dealscout.db"
 price_history_retention_days: 90

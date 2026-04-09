@@ -12,7 +12,7 @@ shops:
           title_prefix: ".product-card-brand"
           title: ".product-card-name"
           price: ".price-value"
-          old_price: ".price-strike"
+          old_price: ".price-old-price"
           url: ".product-card-name[href]"
           image: ".product-card-image img[src]"
         currency: "CHF"
@@ -210,7 +210,8 @@ shops:
         fields:
           products: "products"
           title: "name"
-          price: "price"
+          price: "price_amount"
+          old_price: "regular_price_amount"
           url: "link"
         currency: "CHF"
 

@@ -86,12 +86,12 @@ func processShop(shop config.Shop, f *fetcher.Fetcher, conv *currency.Converter,
 				for _, p := range rawProducts {
 					products++
 
-					cleaned, priceCHF, skip := transformProduct(p, cat, shopClean, catFilter, conv)
+					cleaned, priceCHF, oldPrice, skip := transformProduct(p, cat, shopClean, catFilter, conv)
 					if skip {
 						continue
 					}
 
-					pr, d := evaluateProduct(cleaned, priceCHF, p, cat, shop, eval, seedMode)
+					pr, d := evaluateProduct(cleaned, priceCHF, oldPrice, p, cat, shop, eval, seedMode)
 					evaluated = append(evaluated, pr)
 					if d != nil {
 						deals = append(deals, *d)

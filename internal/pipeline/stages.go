@@ -50,14 +50,17 @@ func parsePageProducts(data []byte, cat config.ShopCategory, shop config.Shop, f
 }
 
 // transformProduct cleans, normalizes, filters, divides price, and converts currency.
-// Returns the cleaned name, CHF price, and whether the product should be skipped.
-func transformProduct(p parser.RawProduct, cat config.ShopCategory, shopClean cleaners.CleanFunc, catFilter cleaners.FilterFunc, conv *currency.Converter) (string, float64, bool) {
+// Returns the cleaned name, CHF price, divided old price, and whether the product should be skipped.
+func transformProduct(p parser.RawProduct, cat config.ShopCategory, shopClean cleaners.CleanFunc, catFilter cleaners.FilterFunc, conv *currency.Converter) (string, float64, *float64, bool) {
+	var oldPrice *float64
 	if cat.PriceDivisor > 0 {
 		p.Price /= cat.PriceDivisor
 		if p.OldPrice != nil {
 			divided := *p.OldPrice / cat.PriceDivisor
-			p.OldPrice = &divided
+			oldPrice = &divided
 		}
+	} else {
+		oldPrice = p.OldPrice
 	}
 
 	cleaned := p.Title
@@ -67,28 +70,29 @@ func transformProduct(p parser.RawProduct, cat config.ShopCategory, shopClean cl
 	cleaned = cleaners.NormalizeName(cleaned)
 
 	if catFilter != nil && catFilter(cleaned) {
-		return "", 0, true
+		return "", 0, nil, true
 	}
 
 	priceCHF, err := conv.Convert(p.Price, cat.Currency)
 	if err != nil {
 		slog.Warn("currency conversion failed", "product", cleaned, "error", err)
-		return "", 0, true
+		return "", 0, nil, true
 	}
 
-	return cleaned, priceCHF, false
+	return cleaned, priceCHF, oldPrice, false
 }
 
 // evaluateProduct runs deal evaluation and builds a ProductResult.
-func evaluateProduct(cleaned string, priceCHF float64, p parser.RawProduct, cat config.ShopCategory, shop config.Shop, eval *deal.Evaluator, seedMode bool) (ProductResult, *deal.Deal) {
-	result := eval.Evaluate(cleaned, cat.Category, shop.Name, priceCHF, p.OldPrice, p.URL, p.ImageURL)
+func evaluateProduct(cleaned string, priceCHF float64, oldPrice *float64, p parser.RawProduct, cat config.ShopCategory, shop config.Shop, eval *deal.Evaluator, seedMode bool) (ProductResult, *deal.Deal) {
+	result := eval.Evaluate(cleaned, cat.Category, shop.Name, priceCHF, oldPrice, p.URL, p.ImageURL)
 
 	pr := ProductResult{
-		Name:   cleaned,
-		Shop:   shop.Name,
-		Price:  priceCHF,
-		URL:    p.URL,
-		Reason: result.Reason,
+		Name:     cleaned,
+		Shop:     shop.Name,
+		Price:    priceCHF,
+		OldPrice: oldPrice,
+		URL:      p.URL,
+		Reason:   result.Reason,
 	}
 
 	if !seedMode && result.Deal != nil {

@@ -64,8 +64,8 @@ func logProducts(products []ProductResult) {
 
 	fmt.Println()
 	fmt.Println("Products found:")
-	fmt.Printf("%-4s %-50s %-15s %10s %8s  %-25s %s\n", "DEAL", "PRODUCT", "SHOP", "PRICE", "DROP", "REASON", "URL")
-	fmt.Printf("%-4s %-50s %-15s %10s %8s  %-25s %s\n", "----", "-------", "----", "-----", "----", "------", "---")
+	fmt.Printf("%-4s %-50s %-15s %10s %10s %8s  %-25s %s\n", "DEAL", "PRODUCT", "SHOP", "PRICE", "OLD PRICE", "DROP", "REASON", "URL")
+	fmt.Printf("%-4s %-50s %-15s %10s %10s %8s  %-25s %s\n", "----", "-------", "----", "-----", "---------", "----", "------", "---")
 
 	for _, p := range products {
 		marker := "    "
@@ -76,6 +76,11 @@ func logProducts(products []ProductResult) {
 		discount := ""
 		if p.Discount > 0 {
 			discount = fmt.Sprintf("-%.0f%%", p.Discount)
+		}
+
+		oldPrice := ""
+		if p.OldPrice != nil && *p.OldPrice > p.Price {
+			oldPrice = fmt.Sprintf("%.2f", *p.OldPrice)
 		}
 
 		reason := ""
@@ -92,7 +97,7 @@ func logProducts(products []ProductResult) {
 			shop = shop[:12] + "..."
 		}
 
-		fmt.Printf("%s %-50s %-15s %10.2f %8s  %-25s %s\n", marker, name, shop, p.Price, discount, reason, p.URL)
+		fmt.Printf("%s %-50s %-15s %10.2f %10s %8s  %-25s %s\n", marker, name, shop, p.Price, oldPrice, discount, reason, p.URL)
 	}
 	fmt.Println()
 }

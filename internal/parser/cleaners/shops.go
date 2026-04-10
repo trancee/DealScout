@@ -58,6 +58,20 @@ func cleanAlltron(name string) string {
 	return strings.TrimSpace(name)
 }
 
+var amazonSuffixRe = regexp.MustCompile(`(?i)[,|]\s*(Android|Smartphone|Handy|Mobiltelefon|Mobile Phone|Telefon|Dual[ -]?SIM|Entsperrt|ohne Vertrag|Unlocked|Simlockfrei|Global Version)|without simlock|Dual SIM|(SIM )?Smartphone|Mobile Phone|\bEU\b|\b[45]G\b|\b(8|128|256)GB\b| - `)
+
+func cleanAmazon(name string) string {
+	// Strip everything from the first category/spec indicator onward.
+	if loc := amazonSuffixRe.FindStringIndex(name); loc != nil {
+		name = name[:loc[0]]
+	}
+
+	// Strip parenthesized specs like "(128GB, Black)".
+	name = regexp.MustCompile(`\s*\([^)]*\)|Compatible with`).ReplaceAllString(name, "")
+
+	return strings.TrimSpace(name)
+}
+
 var brackSpecRe = regexp.MustCompile(`(\s*[-,]\s+)|(\b\d{1,3}\s*GB?\b)|Copilot|\s+CH$`)
 
 func cleanBrack(name string) string {

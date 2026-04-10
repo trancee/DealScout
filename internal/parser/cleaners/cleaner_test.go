@@ -414,3 +414,30 @@ func TestPostShopCleaner(t *testing.T) {
 		})
 	}
 }
+
+func TestAmazonShopCleaner(t *testing.T) {
+	clean := cleaners.ShopCleaner("amazon")
+	if clean == nil {
+		t.Fatal("ShopCleaner(amazon) returned nil")
+	}
+
+	tests := []struct {
+		input, want string
+	}{
+		{"Samsung Galaxy A16, Android Smartphone, 6.5 Zoll, 128 GB Speicher", "Samsung Galaxy A16"},
+		{"Apple iPhone 16 Pro Max 256GB - Space Black", "Apple iPhone 16 Pro Max"},
+		{"Xiaomi Redmi Note 14 Pro 5G | Smartphone ohne Vertrag", "Xiaomi Redmi Note 14 Pro"},
+		{"Nokia 225 Dual SIM 4G Telefone, Schwarz, sc schwarz", "Nokia 225"},
+		{"SAMSUNG Galaxy A15, Android Smartphone, 6,5 Zoll Dynamic AMOLED Display, 5.000 mAh Akku", "SAMSUNG Galaxy A15"},
+		{"Motorola moto g85 5G (256 GB, Cobalt Blue)", "Motorola moto g85"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got := clean(tt.input)
+			if got != tt.want {
+				t.Errorf("got %q, want %q", got, tt.want)
+			}
+		})
+	}
+}

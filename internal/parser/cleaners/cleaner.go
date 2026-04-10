@@ -14,6 +14,7 @@ type FilterFunc func(name string) bool
 var shopCleaners = map[string]CleanFunc{
 	"ackermann":     cleanAckermann,
 	"alltron":       cleanAlltron,
+	"amazon":        cleanAmazon,
 	"brack":         cleanBrack,
 	"conforama":     cleanConforama,
 	"conrad":        cleanConrad,
@@ -30,6 +31,7 @@ var shopCleaners = map[string]CleanFunc{
 
 var urlCleaners = map[string]CleanFunc{
 	"ackermann": stripQueryParams,
+	"amazon":    stripQueryParams,
 }
 
 // ShopCleaner returns a cleaning function for the given shop, or nil if none.

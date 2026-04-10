@@ -43,7 +43,7 @@ var nameMapping = map[string]string{
 	"Thinkbook":     "ThinkBook",
 	"Tuf":           "TUF",
 	"VivoBook":      "Vivobook",
-	"Xcover":        "XCover", "Xl": "XL", "Xr": "XR", "Xs": "XS",
+	"Xcover":        "XCover", "Xa": "XA", "Xl": "XL", "Xr": "XR", "Xs": "XS",
 	"Zte": "ZTE",
 }
 

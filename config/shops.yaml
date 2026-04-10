@@ -136,26 +136,29 @@ shops:
           image_path: "cover.sizes.0.link"
         currency: "CHF"
 
-  # - name: "Amazon"
-  #   source_type: "html"
-  #   cleaner: "amazon"
-  #   base_url: "https://www.amazon.de"
-  #   categories:
-  #     - category: "smartphones"
-  #       url: "https://www.amazon.de/s?k=smartphone&page={page}"
-  #       max_pages: 3
-  #       pagination:
-  #         type: "page_param"
-  #         param: "page"
-  #         start: 1
-  #       selectors:
-  #         product_card: "div[data-component-type='s-search-result']"
-  #         title: "h2 a span"
-  #         price: "span.a-price span.a-offscreen"
-  #         old_price: "span.a-price[data-a-strike] span.a-offscreen"
-  #         url: "h2 a[href]"
-  #         image: "img.s-image[src]"
-  #       currency: "EUR"
+  - name: "Amazon"
+    source_type: "html"
+    cleaner: "amazon"
+    base_url: "https://www.amazon.de"
+    headers:
+      accept: "text/html,application/xhtml+xml"
+      accept-language: "en-US,en;q=0.9,de;q=0.8"
+    categories:
+      - category: "smartphones"
+        url: "https://www.amazon.de/s?i=electronics&bbn=203868645031&rh=n%3A15326400031%2Cp_n_free_shipping_eligible%3A20943778031%2Cp_n_g-1003469290111%3A33626318031%7C33626321031%2Cp_36%3A{min_price}00-{max_price}00&s=price-asc-rank&dc&language=en&page={page}"
+        max_pages: 5
+        pagination:
+          type: "page_param"
+          param: "page"
+          start: 1
+        selectors:
+          product_card: "div[data-component-type='s-search-result']"
+          title: "h2 span"
+          price: "span.a-price span.a-offscreen"
+          old_price: "span.a-price[data-a-strike] span.a-offscreen"
+          url: "a.a-link-normal.s-no-outline[href]"
+          image: "img.s-image[src]"
+        currency: "CHF"
 
   - name: "Brack"
     source_type: "html"

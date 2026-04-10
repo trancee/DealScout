@@ -2,9 +2,7 @@ package pipeline
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"log/slog"
 	"os"
 	"strings"
 	"sync"
@@ -13,7 +11,6 @@ import (
 	"github.com/trancee/DealScout/internal/currency"
 	"github.com/trancee/DealScout/internal/deal"
 	"github.com/trancee/DealScout/internal/fetcher"
-	"github.com/trancee/DealScout/internal/jsonpath"
 	"github.com/trancee/DealScout/internal/parser/cleaners"
 )
 
@@ -22,7 +19,7 @@ func collectDeals(shops []config.Shop, f *fetcher.Fetcher, conv *currency.Conver
 		mu    sync.Mutex
 		deals []deal.Deal
 		wg    sync.WaitGroup
-		sem   = make(chan struct{}, 5) // default concurrency
+		sem   = make(chan struct{}, 5)
 	)
 
 	for _, shop := range shops {
@@ -34,91 +31,20 @@ func collectDeals(shops []config.Shop, f *fetcher.Fetcher, conv *currency.Conver
 			defer func() { <-sem }()
 
 			clearShopDumpDir(dumpDir, shop.Name)
-			shopDeals, shopProducts, products, errors := processShop(shop, f, conv, eval, filters, seedMode, dumpDir, cache)
+			sp := NewShopProcessor(shop, f, conv, eval, filters, seedMode, dumpDir, cache)
+			result := sp.Process()
 
 			mu.Lock()
-			deals = append(deals, shopDeals...)
-			summary.Products = append(summary.Products, shopProducts...)
-			summary.ProductsChecked += products
-			summary.Errors += errors
+			deals = append(deals, result.Deals...)
+			summary.Products = append(summary.Products, result.Products...)
+			summary.ProductsChecked += result.Count
+			summary.Errors += result.Errors
 			mu.Unlock()
 		}(shop)
 	}
 
 	wg.Wait()
 	return deals
-}
-
-func processShop(shop config.Shop, f *fetcher.Fetcher, conv *currency.Converter, eval *deal.Evaluator, filters map[string]config.Filter, seedMode bool, dumpDir string, cache *responseCache) ([]deal.Deal, []ProductResult, int, int) {
-	var (
-		deals     []deal.Deal
-		evaluated []ProductResult
-		products  int
-		errors    int
-	)
-
-	shopClean := cleaners.ShopCleaner(shop.Cleaner)
-	urlClean := cleaners.URLCleaner(shop.Cleaner)
-
-	if shop.TokenEndpoint != nil {
-		token, err := fetchBearerToken(f, shop.TokenEndpoint)
-		if err != nil {
-			slog.Error("token fetch failed", "shop", shop.Name, "error", err)
-			return nil, nil, 0, 1
-		}
-		if shop.Headers == nil {
-			shop.Headers = make(map[string]string)
-		}
-		shop.Headers["Authorization"] = "Bearer " + token
-	}
-
-	for _, cat := range shop.Categories {
-		cat, priceReplacements := resolvePricePlaceholders(cat, eval.Rules(), shop.PriceBuckets)
-		catFilter := buildFilter(cat.Category, filters)
-
-		for urlIdx, catURL := range categoryURLs(cat) {
-			cacheKey := fmt.Sprintf("%s_%d", cat.Category, urlIdx)
-			fetchCat := cat
-			fetchCat.URL = catURL
-
-			for page := range cat.MaxPages {
-				data, err := fetchPageData(f, shop, fetchCat, page, priceReplacements, cacheKey, cache, dumpDir)
-				if err != nil {
-					slog.Error("fetch failed", "shop", shop.Name, "category", cat.Category, "page", page, "error", err)
-					errors++
-					break
-				}
-
-				rawProducts, err := parsePageProducts(data, cat, shop, f, dumpDir, cache)
-				if err != nil {
-					slog.Error("parse failed", "shop", shop.Name, "category", cat.Category, "error", err)
-					errors++
-					continue
-				}
-
-				for _, p := range rawProducts {
-					products++
-
-					if urlClean != nil {
-						p.URL = urlClean(p.URL)
-					}
-
-					cleaned, priceCHF, oldPrice, skip := transformProduct(p, cat, shopClean, catFilter, conv)
-					if skip {
-						continue
-					}
-
-					pr, d := evaluateProduct(cleaned, priceCHF, oldPrice, p, cat, shop, eval, seedMode)
-					evaluated = append(evaluated, pr)
-					if d != nil {
-						deals = append(deals, *d)
-					}
-				}
-			}
-		}
-	}
-
-	return deals, evaluated, products, errors
 }
 
 func fetchPage(f *fetcher.Fetcher, shop config.Shop, cat config.ShopCategory, page int, priceReplacements map[string]string) ([]byte, error) {
@@ -158,30 +84,12 @@ func buildFilter(category string, filters map[string]config.Filter) cleaners.Fil
 	return cleaners.NewFilter(f)
 }
 
-// fetchBearerToken calls a token endpoint and extracts a token string via a JSON path.
-func fetchBearerToken(f *fetcher.Fetcher, ep *config.TokenEndpoint) (string, error) {
-	data, err := f.Get(ep.URL)
-	if err != nil {
-		return "", fmt.Errorf("fetching token from %s: %w", ep.URL, err)
-	}
-	var raw interface{}
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return "", fmt.Errorf("parsing token response: %w", err)
-	}
-	token := jsonpath.String(raw, ep.TokenPath)
-	if token == "" {
-		return "", fmt.Errorf("token not found at path %q", ep.TokenPath)
-	}
-	return token, nil
-}
-
 func stripJSONP(data []byte, callback string) []byte {
 	prefix := []byte(callback + "(")
 	if !bytes.HasPrefix(data, prefix) {
 		return data
 	}
 	data = data[len(prefix):]
-	// Strip trailing ");", ")", or ")\n"
 	data = bytes.TrimRight(data, ";\n\r ")
 	if len(data) > 0 && data[len(data)-1] == ')' {
 		data = data[:len(data)-1]

@@ -6,48 +6,9 @@ import (
 	"github.com/trancee/DealScout/internal/config"
 	"github.com/trancee/DealScout/internal/currency"
 	"github.com/trancee/DealScout/internal/deal"
-	"github.com/trancee/DealScout/internal/fetcher"
 	"github.com/trancee/DealScout/internal/parser"
 	"github.com/trancee/DealScout/internal/parser/cleaners"
 )
-
-// fetchPageData fetches a page from cache or network, stores in cache, and dumps.
-func fetchPageData(f *fetcher.Fetcher, shop config.Shop, cat config.ShopCategory, page int, priceReplacements map[string]string, cacheKey string, cache *responseCache, dumpDir string) ([]byte, error) {
-	data, cached := cache.get(shop.Name, cacheKey, page)
-	if !cached {
-		var err error
-		data, err = fetchPage(f, shop, cat, page, priceReplacements)
-		if err != nil {
-			return nil, err
-		}
-		cache.put(shop.Name, cacheKey, page, data)
-	}
-
-	dumpResponse(dumpDir, shop.Name, cacheKey, page,
-		fetchMethod(cat), buildRequestURL(cat, page), shop.Headers, fetchBody(cat, page, priceReplacements), data)
-
-	return data, nil
-}
-
-// parsePageProducts parses raw response data into products, handling JSONP, enrichment, and URL resolution.
-func parsePageProducts(data []byte, cat config.ShopCategory, shop config.Shop, f *fetcher.Fetcher, dumpDir string, cache *responseCache) ([]parser.RawProduct, error) {
-	if cat.JSONPCallback != "" {
-		data = stripJSONP(data, cat.JSONPCallback)
-	}
-
-	rawProducts, err := parser.Parse(cat, data, shop.BaseURL)
-	if err != nil {
-		return nil, err
-	}
-
-	if cat.PriceAPI != nil {
-		rawProducts = enrichPrices(rawProducts, cat.PriceAPI, f, cat, shop, dumpDir, cache)
-	}
-
-	parser.ResolveProductURLs(rawProducts, shop.BaseURL, cat.URLTemplate)
-
-	return rawProducts, nil
-}
 
 // transformProduct cleans, normalizes, filters, divides price, and converts currency.
 // Returns the cleaned name, CHF price, divided old price, and whether the product should be skipped.
@@ -64,7 +25,6 @@ func transformProduct(p parser.RawProduct, cat config.ShopCategory, shopClean cl
 	}
 
 	cleaned := p.Title
-	// fmt.Println(">>>", cleaned)
 	if shopClean != nil {
 		cleaned = shopClean(cleaned)
 	}

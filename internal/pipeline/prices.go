@@ -55,6 +55,9 @@ func resolvePricePlaceholders(cat config.ShopCategory, rules map[string]config.D
 // buildPriceBuckets selects price buckets that overlap with [minPrice, maxPrice]
 // and formats them using the configured format string.
 func buildPriceBuckets(pb *config.PriceBuckets, minPrice, maxPrice float64) string {
+	if pb == nil {
+		return ""
+	}
 	var parts []string
 	for _, r := range pb.Ranges {
 		if r.Start < maxPrice && r.End > minPrice {

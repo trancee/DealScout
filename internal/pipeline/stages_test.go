@@ -24,10 +24,8 @@ func TestTransformProduct(t *testing.T) {
 	db := mustOpenDB(t)
 	conv := currency.New(db, "", "CHF", 24)
 
-	cat := config.ShopCategory{Pricing: config.Pricing{Currency: "CHF"}}
-
 	p := parser.RawProduct{Title: "SAMSUNG Galaxy A16 128GB", Price: 149.0}
-	cleaned, priceCHF, _, skip := transformProduct(p, cat, nil, nil, conv)
+	cleaned, priceCHF, _, skip := transformProduct(p, "", 0, "CHF", nil, nil, conv)
 
 	if skip {
 		t.Fatal("should not skip")
@@ -44,10 +42,8 @@ func TestTransformProductWithDivisor(t *testing.T) {
 	db := mustOpenDB(t)
 	conv := currency.New(db, "", "CHF", 24)
 
-	cat := config.ShopCategory{Pricing: config.Pricing{Currency: "CHF", PriceDivisor: 100}}
-
 	p := parser.RawProduct{Title: "Test Phone", Price: 14900.0}
-	_, priceCHF, _, skip := transformProduct(p, cat, nil, nil, conv)
+	_, priceCHF, _, skip := transformProduct(p, "", 100, "CHF", nil, nil, conv)
 
 	if skip {
 		t.Fatal("should not skip")
@@ -61,11 +57,10 @@ func TestTransformProductFiltered(t *testing.T) {
 	db := mustOpenDB(t)
 	conv := currency.New(db, "", "CHF", 24)
 
-	cat := config.ShopCategory{Pricing: config.Pricing{Currency: "CHF"}}
-	filter := func(name string) bool { return true } // skip everything
+	filter := func(name string) bool { return true }
 
 	p := parser.RawProduct{Title: "Test Phone", Price: 100.0}
-	_, _, _, skip := transformProduct(p, cat, nil, filter, conv)
+	_, _, _, skip := transformProduct(p, "", 0, "CHF", nil, filter, conv)
 
 	if !skip {
 		t.Error("should be skipped by filter")
@@ -78,12 +73,10 @@ func TestEvaluateProductDeal(t *testing.T) {
 		"smartphones": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10},
 	}
 	eval := deal.NewEvaluator(db, rules, 24)
-	shop := config.Shop{Name: "TestShop"}
-	cat := config.ShopCategory{Category: "smartphones", Pricing: config.Pricing{Currency: "CHF"}}
 
 	p := parser.RawProduct{Title: "Test Phone", Price: 149.0, URL: "https://example.com"}
 
-	pr, d := evaluateProduct("Test Phone", 149.0, nil, p, cat, shop, eval, false)
+	pr, d := evaluateProduct("Test Phone", 149.0, nil, p, "smartphones", "TestShop", eval, false)
 
 	if d == nil {
 		t.Fatal("expected deal for first-seen product in range")
@@ -102,12 +95,10 @@ func TestEvaluateProductSeedMode(t *testing.T) {
 		"smartphones": {MinPrice: 50, MaxPrice: 350, MinDiscountPct: 10},
 	}
 	eval := deal.NewEvaluator(db, rules, 24)
-	shop := config.Shop{Name: "TestShop"}
-	cat := config.ShopCategory{Category: "smartphones", Pricing: config.Pricing{Currency: "CHF"}}
 
 	p := parser.RawProduct{Title: "Test Phone", Price: 149.0}
 
-	pr, d := evaluateProduct("Test Phone", 149.0, nil, p, cat, shop, eval, true)
+	pr, d := evaluateProduct("Test Phone", 149.0, nil, p, "smartphones", "TestShop", eval, true)
 
 	if d != nil {
 		t.Error("seed mode should not produce deals")

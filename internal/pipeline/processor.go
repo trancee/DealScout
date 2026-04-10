@@ -124,12 +124,12 @@ func (sp *ShopProcessor) processCategory(cat config.ShopCategory, result *ShopRe
 					p.URL = sp.urlClean(p.URL)
 				}
 
-				cleaned, priceCHF, oldPrice, skip := transformProduct(p, cat, sp.shopClean, catFilter, sp.conv)
+				cleaned, priceCHF, oldPrice, skip := transformProduct(p, cat.Category, cat.PriceDivisor, cat.Currency, sp.shopClean, catFilter, sp.conv)
 				if skip {
 					continue
 				}
 
-				pr, d := evaluateProduct(cleaned, priceCHF, oldPrice, p, cat, sp.shop, sp.eval, sp.seedMode)
+				pr, d := evaluateProduct(cleaned, priceCHF, oldPrice, p, cat.Category, sp.shop.Name, sp.eval, sp.seedMode)
 				result.Products = append(result.Products, pr)
 				if d != nil {
 					result.Deals = append(result.Deals, *d)

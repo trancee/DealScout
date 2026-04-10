@@ -12,4 +12,4 @@ price_history_retention_days: 90
 default_max_pages: 5
 telegram_topics:
   smartphones: 0
-  laptops: 0
+  notebooks: 0

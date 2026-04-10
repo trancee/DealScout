@@ -32,13 +32,15 @@ type Settings struct {
 
 // Shop represents a single shop with its categories.
 type Shop struct {
-	Name       string            `yaml:"name"`
-	SourceType string            `yaml:"source_type"`
-	Method     string            `yaml:"method"`
-	Cleaner    string            `yaml:"cleaner"`
-	BaseURL    string            `yaml:"base_url"`
-	Headers    map[string]string `yaml:"headers"`
-	Categories []ShopCategory    `yaml:"categories"`
+	Name          string            `yaml:"name"`
+	SourceType    string            `yaml:"source_type"`
+	Method        string            `yaml:"method"`
+	Cleaner       string            `yaml:"cleaner"`
+	BaseURL       string            `yaml:"base_url"`
+	Headers       map[string]string `yaml:"headers"`
+	TokenEndpoint *TokenEndpoint    `yaml:"token_endpoint"`
+	PriceBuckets  *PriceBuckets     `yaml:"price_buckets"`
+	Categories    []ShopCategory    `yaml:"categories"`
 }
 
 // ShopCategory represents one category within a shop.
@@ -108,6 +110,27 @@ type Pagination struct {
 	Param   string `yaml:"param"`
 	PerPage int    `yaml:"per_page"`
 	Start   int    `yaml:"start"`
+}
+
+// TokenEndpoint defines an HTTP endpoint that returns a bearer token.
+// The token is fetched once per shop run and injected as an Authorization header.
+type TokenEndpoint struct {
+	URL       string `yaml:"url"`
+	TokenPath string `yaml:"token_path"`
+}
+
+// PriceBuckets defines predefined price ranges for APIs that only support bucket-based filtering.
+// At runtime, buckets overlapping the deal rule's [min_price, max_price] are selected
+// and formatted into the {price_buckets} URL placeholder.
+type PriceBuckets struct {
+	Format string         `yaml:"format"`
+	Ranges []PriceRange   `yaml:"ranges"`
+}
+
+// PriceRange defines a single price bucket with start and end values.
+type PriceRange struct {
+	Start float64 `yaml:"start"`
+	End   float64 `yaml:"end"`
 }
 
 // DealRule defines the deal detection parameters for a category.

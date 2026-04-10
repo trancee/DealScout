@@ -1,6 +1,9 @@
 package cleaners
 
-import "strings"
+import (
+	"net/url"
+	"strings"
+)
 
 // CleanFunc transforms a product name (strip artifacts, normalize).
 type CleanFunc func(name string) string
@@ -9,24 +12,44 @@ type CleanFunc func(name string) string
 type FilterFunc func(name string) bool
 
 var shopCleaners = map[string]CleanFunc{
-	"galaxus":        cleanGalaxus,
-	"amazon":         cleanAmazon,
-	"ackermann":      cleanAckermann,
-	"brack":          cleanBrack,
-	"conrad":         cleanConrad,
-	"foletti":        cleanFoletti,
-	"interdiscount":  cleanInterdiscount,
-	"mediamarkt":     cleanMediamarkt,
-	"mobilezone":     cleanMobilezone,
-	"orderflow":      cleanOrderflow,
-	"alltron":        cleanAlltron,
-	"cashconverters": cleanCashConverters,
-	"hopcash":        cleanHopCash,
+	"ackermann":     cleanAckermann,
+	"alltron":       cleanAlltron,
+	"brack":         cleanBrack,
+	"conforama":     cleanConforama,
+	"conrad":        cleanConrad,
+	"foletti":       cleanFoletti,
+	"galaxus":       cleanGalaxus,
+	"interdiscount": cleanInterdiscount,
+	"mediamarkt":    cleanMediamarkt,
+	"mobilezone":    cleanMobilezone,
+	"orderflow":     cleanOrderflow,
+	"postshop":      cleanPostShop,
+	// "cashconverters": cleanCashConverters,
+	// "hopcash":        cleanHopCash,
+}
+
+var urlCleaners = map[string]CleanFunc{
+	"ackermann": stripQueryParams,
 }
 
 // ShopCleaner returns a cleaning function for the given shop, or nil if none.
 func ShopCleaner(shopName string) CleanFunc {
 	return shopCleaners[strings.ToLower(shopName)]
+}
+
+// URLCleaner returns a URL cleaning function for the given shop, or nil if none.
+func URLCleaner(shopName string) CleanFunc {
+	return urlCleaners[strings.ToLower(shopName)]
+}
+
+// stripQueryParams removes all query parameters from a URL.
+func stripQueryParams(rawURL string) string {
+	parsed, err := url.Parse(rawURL)
+	if err != nil {
+		return rawURL
+	}
+	parsed.RawQuery = ""
+	return parsed.String()
 }
 
 // CategoryCleaner returns a cleaning function for the given category, or nil if none.

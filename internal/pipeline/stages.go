@@ -64,10 +64,11 @@ func transformProduct(p parser.RawProduct, cat config.ShopCategory, shopClean cl
 	}
 
 	cleaned := p.Title
+	// fmt.Println(">>>", cleaned)
 	if shopClean != nil {
 		cleaned = shopClean(cleaned)
 	}
-	cleaned = cleaners.NormalizeName(cleaned)
+	cleaned = cleaners.NormalizeName(cleaned, cat.Category)
 
 	if catFilter != nil && catFilter(cleaned) {
 		return "", 0, nil, true

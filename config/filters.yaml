@@ -8,14 +8,17 @@ smartphones:
     - Hammer
     - Inoi
     - Intercom
+    - Konrow
+    - Logicom
     - Olympia
     - Panasonic
     - Sonim
     - SPC
     - TCL
     - Ubiquiti
-  exclusion_regex: (?i)\d+W GAN|Adapter|AirTag|Armband|Back Cover|Book Cover|Cable|Case|Charger|Cover\b|Duftkerze|Earphones|Etui|Gimbal|Halterung|Headset|Hülle|Ideal of Sweden|Induktive|Kalender|Kopfhörer|Ladegerät|Ladestation|Lautsprecher|MagSafe|Powerbank|Screen Protector|Schutzfolie|Schutzglas|SmartTag|Stylus|Tastatur|Tisch|Wireless Charger
+  exclusion_regex: (?i)\d+W GAN|Adapter|AirTag|Armband|Back Cover|Book Cover|Cable|Case|Charger|Cover\b|Duftkerze|Earphones|Etui|Gimbal|Halterung|Headset|Hülle|Ideal of Sweden|Induktive|Kalender|Kopfhörer|Ladegerät|Ladestation|Lautsprecher|MagSafe|Powerbank|Screen Protector|Schutzfolie|Schutzglas|SmartTag|Stylus|Tastatur|Tisch|Watch|Wireless Charger
 
-laptops:
-  skip_brands: []
+notebooks:
+  skip_brands:
+    - Microsoft
   exclusion_regex: (?i)Tasche|Sleeve

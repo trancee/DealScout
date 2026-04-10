@@ -104,7 +104,7 @@ price_history_retention_days: 90
 default_max_pages: 5
 telegram_topics:
   smartphones: 42            # message_thread_id per category
-  laptops: 43
+  notebooks: 43
   headphones: 44
 ```
 
@@ -129,7 +129,7 @@ smartphones:
   max_price: 350
   min_discount_pct: 10
 
-laptops:
+notebooks:
   min_price: 400
   max_price: 1200
   min_discount_pct: 15
@@ -160,7 +160,7 @@ DealScout sends notifications to a Telegram supergroup with Forum Topics. Each p
 #### Step 2: Create a supergroup with Forum Topics
 
 1. Create a new **Group** → enable **Topics** in settings
-2. Create a topic for each category (📱 Smartphones, 💻 Laptops, etc.)
+2. Create a topic for each category (📱 Smartphones, 💻 notebooks, etc.)
 
 #### Step 3: Add the bot as admin
 

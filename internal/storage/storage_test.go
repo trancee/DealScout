@@ -68,7 +68,7 @@ func TestUpsertProduct(t *testing.T) {
 	}
 
 	// Different category — should be new.
-	id3, isNew3, err := db.UpsertProduct("Samsung Galaxy A15", "laptops")
+	id3, isNew3, err := db.UpsertProduct("Samsung Galaxy A15", "notebooks")
 	if err != nil {
 		t.Fatalf("third UpsertProduct: %v", err)
 	}

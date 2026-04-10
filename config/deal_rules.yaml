@@ -3,9 +3,9 @@ smartphones:
   max_price: 150
   min_discount_pct: 10
 
-laptops:
-  min_price: 400
-  max_price: 1200
+notebooks:
+  min_price: 500
+  max_price: 1500
   min_discount_pct: 15
 
 headphones:
@@ -15,5 +15,5 @@ headphones:
 
 monitors:
   min_price: 400
-  max_price: 1200
+  max_price: 1000
   min_discount_pct: 15

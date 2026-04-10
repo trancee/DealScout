@@ -1,6 +1,7 @@
 package fetcher
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io"
 	"log/slog"
@@ -35,7 +36,12 @@ func New(delaySeconds int, maxRetries int) *Fetcher {
 		delaySeconds:   delaySeconds,
 		maxRetries:     maxRetries,
 		retryBaseDelay: time.Second,
-		client:         &http.Client{Timeout: 30 * time.Second},
+		client: &http.Client{
+			Timeout: 30 * time.Second,
+			Transport: &http.Transport{
+				TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
+			},
+		},
 	}
 }
 

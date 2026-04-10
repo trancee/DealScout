@@ -1,20 +1,63 @@
 shops:
   - name: "Ackermann"
-    source_type: "html"
+    source_type: "json"
+    method: "POST"
     cleaner: "ackermann"
     base_url: "https://www.ackermann.ch"
+    headers:
+      content-type: "application/json"
+      accept: "application/json"
     categories:
       - category: "smartphones"
-        url: 'https://www.ackermann.ch/technik/multimedia/smartphones-telefone/?f={base64_start}{"filter_Kategorie":["fb_ktgr_mblt.fn_d8"],"filter_price":["{min_price}-{max_price}"]}{base64_end}&o=price-asc'
+        url: "https://www.ackermann.ch/api/gateway/"
+        body_template: "templates/ackermann_smartphones.json"
         max_pages: 1
-        selectors:
-          product_card: "li.product-card"
-          title_prefix: ".product-card-brand"
-          title: ".product-card-name"
-          price: ".price-value"
-          old_price: ".price-old-price"
-          url: ".product-card-name[href]"
-          image: ".product-card-image img[src]"
+        pagination:
+          type: "offset"
+          per_page: 72
+        price_divisor: 100
+        fields:
+          products: "data.category.items"
+          title_prefix: "brand.name"
+          title: "styleName"
+          price: "primaryVariationGroup.price.currentPrice"
+          old_price: "primaryVariationGroup.price.discount.previousPrice"
+          url: "primaryVariationGroup.href"
+          image: "primaryVariationGroup.image"
+        currency: "CHF"
+      - category: "notebooks"
+        url: "https://www.ackermann.ch/api/gateway/"
+        body_template: "templates/ackermann_notebooks.json"
+        max_pages: 2
+        pagination:
+          type: "offset"
+          per_page: 72
+        price_divisor: 100
+        fields:
+          products: "data.category.items"
+          title_prefix: "brand.name"
+          title: "styleName"
+          price: "primaryVariationGroup.price.currentPrice"
+          old_price: "primaryVariationGroup.price.discount.previousPrice"
+          url: "primaryVariationGroup.href"
+          image: "primaryVariationGroup.image"
+        currency: "CHF"
+      - category: "monitors"
+        url: "https://www.ackermann.ch/api/gateway/"
+        body_template: "templates/ackermann_monitors.json"
+        max_pages: 1
+        pagination:
+          type: "offset"
+          per_page: 72
+        price_divisor: 100
+        fields:
+          products: "data.category.items"
+          title_prefix: "brand.name"
+          title: "styleName"
+          price: "primaryVariationGroup.price.currentPrice"
+          old_price: "primaryVariationGroup.price.discount.previousPrice"
+          url: "primaryVariationGroup.href"
+          image: "primaryVariationGroup.image"
         currency: "CHF"
 
   - name: "Alltron"
@@ -27,8 +70,56 @@ shops:
       x-requested-with: "XMLHttpRequest"
     categories:
       - category: "smartphones"
-        url: "https://alltron.ch/api/v1/catalog/search?path=%2Ftelco-ucc%2Fmobiltelefonie%2Fsmartphones&limit=48&page=1&sortProducts=priceasc&filters=availability%3A%3A%3AVerf%C3%BCgbar%7C%7C%7Cprice_standard%3A%3A%3A{min_price}~~~{max_price}&listView=listshop&searchEarlyFilter=true&format=json"
+        url: "https://alltron.ch/api/v1/catalog/search?path=%2Ftelco-ucc%2Fmobiltelefonie%2Fsmartphones&limit=48&page={page}&sortProducts=priceasc&filters=availability%3A%3A%3AVerf%C3%BCgbar%7C%7C%7Cprice_standard%3A%3A%3A{min_price}~~~{max_price}&listView=listshop&searchEarlyFilter=true&format=json"
         max_pages: 1
+        pagination:
+          type: "page_param"
+          param: "page"
+          start: 1
+        fields:
+          products: "products"
+          url: "sku"
+        url_template: "https://alltron.ch/de/product/{id}"
+        price_api:
+          url: "https://alltron.ch/api/v1/products/multiple-tiles/{ids}"
+          headers:
+            accept-language: "de"
+            accept: "application/json"
+            x-requested-with: "XMLHttpRequest"
+          price_path: "effectivePricing.userPrice"
+          old_price_path: "effectivePricing.mainPrice"
+          title_path: "description.title"
+          image_path: "cover.sizes.0.link"
+        currency: "CHF"
+      - category: "notebooks"
+        url: "https://alltron.ch/api/v1/catalog/search?path=%2Fcomputing-software%2Fpc-notebooks-tablets%2Fnotebook&limit=48&page={page}&sortProducts=priceasc&filters=availability%3A%3A%3AVerf%C3%BCgbar%7C%7C%7CattributeGroupFacet_npu-neural-processing-unit%3A%3A%3AJa%7C%7C%7CattributeUnitGroupFacet_verbauter-arbeitsspeicher%3A%3A%3A32~~~128%7C%7C%7CattributeUnitGroupFacet_bildschirmdiagonale-in-zoll%3A%3A%3A15~~~17%7C%7C%7CattributeGroupFacet_geraetetyp%3A%3A%3ANotebook%7C%7C%7Cprice_standard%3A%3A%3A{min_price}~~~{max_price}&listView=listshop&searchEarlyFilter=true&format=json"
+        max_pages: 3
+        pagination:
+          type: "page_param"
+          param: "page"
+          start: 1
+        fields:
+          products: "products"
+          url: "sku"
+        url_template: "https://alltron.ch/de/product/{id}"
+        price_api:
+          url: "https://alltron.ch/api/v1/products/multiple-tiles/{ids}"
+          headers:
+            accept-language: "de"
+            accept: "application/json"
+            x-requested-with: "XMLHttpRequest"
+          price_path: "effectivePricing.userPrice"
+          old_price_path: "effectivePricing.mainPrice"
+          title_path: "description.title"
+          image_path: "cover.sizes.0.link"
+        currency: "CHF"
+      - category: "monitors"
+        url: "https://alltron.ch/api/v1/catalog/search?path=%2Fcomputing-software%2Fperipherie%2Fmonitore%2Fmonitore&limit=48&page={page}&sortProducts=priceasc&filters=availability%3A%3A%3AVerf%C3%BCgbar%7C%7C%7Cprice_standard%3A%3A%3A{min_price}~~~{max_price}%7C%7C%7CattributeGroupFacet_curved%3A%3A%3AJa%7C%7C%7CattributeGroupFacet_paneltyp%3A%3A%3AOLED%7C%7C%7CattributeGroupFacet_aufloesung%3A%3A%3A3840%20x%202160%20%28Ultra%20HD%204K%29&listView=listshop&searchEarlyFilter=true&format=json"
+        max_pages: 1
+        pagination:
+          type: "page_param"
+          param: "page"
+          start: 1
         fields:
           products: "products"
           url: "sku"
@@ -45,26 +136,26 @@ shops:
           image_path: "cover.sizes.0.link"
         currency: "CHF"
 
-  - name: "Amazon"
-    source_type: "html"
-    cleaner: "amazon"
-    base_url: "https://www.amazon.de"
-    categories:
-      - category: "smartphones"
-        url: "https://www.amazon.de/s?k=smartphone&page={page}"
-        max_pages: 3
-        pagination:
-          type: "page_param"
-          param: "page"
-          start: 1
-        selectors:
-          product_card: "div[data-component-type='s-search-result']"
-          title: "h2 a span"
-          price: "span.a-price span.a-offscreen"
-          old_price: "span.a-price[data-a-strike] span.a-offscreen"
-          url: "h2 a[href]"
-          image: "img.s-image[src]"
-        currency: "EUR"
+  # - name: "Amazon"
+  #   source_type: "html"
+  #   cleaner: "amazon"
+  #   base_url: "https://www.amazon.de"
+  #   categories:
+  #     - category: "smartphones"
+  #       url: "https://www.amazon.de/s?k=smartphone&page={page}"
+  #       max_pages: 3
+  #       pagination:
+  #         type: "page_param"
+  #         param: "page"
+  #         start: 1
+  #       selectors:
+  #         product_card: "div[data-component-type='s-search-result']"
+  #         title: "h2 a span"
+  #         price: "span.a-price span.a-offscreen"
+  #         old_price: "span.a-price[data-a-strike] span.a-offscreen"
+  #         url: "h2 a[href]"
+  #         image: "img.s-image[src]"
+  #       currency: "EUR"
 
   # Galaxus is disabled — blocked by Akamai Bot Manager (requires headless browser).
   # See DESIGN.md §13 for future headless browser support.
@@ -103,8 +194,12 @@ shops:
     base_url: "https://www.brack.ch"
     categories:
       - category: "smartphones"
-        url: "https://www.brack.ch/it-multimedia/handy-telefonie/smartphone-handy/smartphones?filter%5Bprice_standard%5D%5B%5D={min_price}~~~{max_price}&filter%5Bavailability%5D%5B%5D=Verf%C3%BCgbar&sortProducts=priceasc"
+        url: "https://www.brack.ch/it-multimedia/handy-telefonie/smartphone-handy/smartphones?page={page}&limit=192&filter%5Bprice_standard%5D%5B%5D={min_price}~~~{max_price}&filter%5Bavailability%5D%5B%5D=Verf%C3%BCgbar"
         max_pages: 1
+        pagination:
+          type: "page_param"
+          param: "page"
+          start: 1
         json_selector: "script#b2c-search-products"
         price_divisor: 100
         fields:
@@ -115,6 +210,102 @@ shops:
           old_price: "price.standardPrice.priceWithVat"
           url: "url"
           image: "images.0.sizes.0.src"
+        currency: "CHF"
+      - category: "notebooks"
+        url: "https://www.brack.ch/it-multimedia/computer-tablets/notebook?page={page}&limit=192&sortProducts=priceasc&filter%5Bprice_standard%5D%5B%5D={min_price}~~~{max_price}&filter%5BattributeGroupFacet_npu-neural-processing-unit%5D%5B%5D=Ja&filter%5BattributeGroupFacet_geraetetyp%5D%5B%5D=Notebook&filter%5BattributeUnitGroupFacet_bildschirmdiagonale-in-zoll%5D%5B%5D=15~~~17&filter%5BattributeUnitGroupFacet_verbauter-arbeitsspeicher%5D%5B%5D=32~~~128&filter%5Bavailability%5D%5B%5D=Verf%C3%BCgbar"
+        max_pages: 1
+        pagination:
+          type: "page_param"
+          param: "page"
+          start: 1
+        json_selector: "script#b2c-search-products"
+        price_divisor: 100
+        fields:
+          products: "productDataMap"
+          title_prefix: "manufacturer.name"
+          title: "description.nameWithoutManufacturer"
+          price: "price.priceWithVat"
+          old_price: "price.standardPrice.priceWithVat"
+          url: "url"
+          image: "images.0.sizes.0.src"
+        currency: "CHF"
+      - category: "monitors"
+        url: "https://www.brack.ch/it-multimedia/peripherie-kabel/monitore?page={page}&limit=192&sortProducts=priceasc&filter%5Bprice_standard%5D%5B%5D={min_price}~~~{max_price}&filter%5BattributeGroupFacet_paneltyp%5D%5B%5D=OLED&filter%5BattributeGroupFacet_curved%5D%5B%5D=Ja&filter%5Bavailability%5D%5B%5D=Verf%C3%BCgbar"
+        max_pages: 1
+        pagination:
+          type: "page_param"
+          param: "page"
+          start: 1
+        json_selector: "script#b2c-search-products"
+        price_divisor: 100
+        fields:
+          products: "productDataMap"
+          title_prefix: "manufacturer.name"
+          title: "description.nameWithoutManufacturer"
+          price: "price.priceWithVat"
+          old_price: "price.standardPrice.priceWithVat"
+          url: "url"
+          image: "images.0.sizes.0.src"
+        currency: "CHF"
+
+  - name: "Conforama"
+    source_type: "json"
+    method: "POST"
+    cleaner: "conforama"
+    base_url: "https://www.conforama.ch"
+    token_endpoint:
+      url: "https://api.c4avqjtcp1-conforama1-p1-public.model-t.cc.commerce.ondemand.com/occ/v2/conforama/coveo/token/products"
+      token_path: "token"
+    headers:
+      content-type: "application/json"
+    categories:
+      - category: "smartphones"
+        url: "https://conforamasuissesaproductiona7ej0kj7.org.coveo.com/rest/organizations/conforamasuissesaproductiona7ej0kj7/commerce/v2/listing"
+        body_template: "templates/conforama_smartphones.json"
+        max_pages: 3
+        pagination:
+          type: "offset"
+          per_page: 1
+        fields:
+          products: "products"
+          title: "ec_name"
+          title_suffix: "additionalFields.cf_product_subname"
+          price: "ec_promo_price"
+          old_price: "additionalFields.cf_product_price_baseprice"
+          url: "clickUri"
+          image: "ec_thumbnails.0"
+        currency: "CHF"
+      - category: "notebooks"
+        url: "https://conforamasuissesaproductiona7ej0kj7.org.coveo.com/rest/organizations/conforamasuissesaproductiona7ej0kj7/commerce/v2/listing"
+        body_template: "templates/conforama_notebooks.json"
+        max_pages: 3
+        pagination:
+          type: "offset"
+          per_page: 1
+        fields:
+          products: "products"
+          title: "ec_name"
+          title_suffix: "additionalFields.cf_product_subname"
+          price: "ec_promo_price"
+          old_price: "additionalFields.cf_product_price_baseprice"
+          url: "clickUri"
+          image: "ec_thumbnails.0"
+        currency: "CHF"
+      - category: "monitors"
+        url: "https://conforamasuissesaproductiona7ej0kj7.org.coveo.com/rest/organizations/conforamasuissesaproductiona7ej0kj7/commerce/v2/listing"
+        body_template: "templates/conforama_monitors.json"
+        max_pages: 3
+        pagination:
+          type: "offset"
+          per_page: 1
+        fields:
+          products: "products"
+          title: "ec_name"
+          title_suffix: "additionalFields.cf_product_subname"
+          price: "ec_promo_price"
+          old_price: "additionalFields.cf_product_price_baseprice"
+          url: "clickUri"
+          image: "ec_thumbnails.0"
         currency: "CHF"
 
   - name: "Conrad"
@@ -272,4 +463,68 @@ shops:
           old_price: "span.second_price span.price"
           url: "h4 a[href]"
           image: "img.img-fluid[src]"
+        currency: "CHF"
+
+  - name: "PostShop"
+    source_type: "json"
+    cleaner: "postshop"
+    base_url: "https://shop.post.ch"
+    headers:
+      accept: "application/json"
+    price_buckets:
+      format: "%3Aprice%3ACHF+{start}-CHF+{end}"
+      ranges:
+        - { start: 0, end: 99.99 }
+        - { start: 100, end: 199.99 }
+        - { start: 200, end: 299.99 }
+        - { start: 300, end: 399.99 }
+        - { start: 400, end: 499.99 }
+        - { start: 500, end: 599.99 }
+        - { start: 600, end: 699.99 }
+        - { start: 700, end: 799.99 }
+        - { start: 800, end: 899.99 }
+        - { start: 900, end: 999.99 }
+        # - { start: 1000, end: 100000 }
+    categories:
+      - category: "smartphones"
+        url: "https://apis.shop.post.ch/occ/v2/postshop-spa/products/search?fields=SEARCH&query=%3Aprice-asc%3AallCategories%3Amobiles{price_buckets}&pageSize=100&currentPage={page}&lang=de&curr=CHF"
+        max_pages: 1
+        pagination:
+          type: "page_param"
+          param: "page"
+          start: 0
+        fields:
+          products: "products"
+          title: "name"
+          price: "price.value"
+          url: "url"
+          image: "images.0.url"
+        currency: "CHF"
+      - category: "notebooks"
+        url: "https://apis.shop.post.ch/occ/v2/postshop-spa/products/search?fields=SEARCH&query=%3Aprice-asc%3AallCategories%3Anotebooks{price_buckets}&pageSize=100&currentPage={page}&lang=de&curr=CHF"
+        max_pages: 8
+        pagination:
+          type: "page_param"
+          param: "page"
+          start: 0
+        fields:
+          products: "products"
+          title: "name"
+          price: "price.value"
+          url: "url"
+          image: "images.0.url"
+        currency: "CHF"
+      - category: "monitors"
+        url: "https://apis.shop.post.ch/occ/v2/postshop-spa/products/search?fields=SEARCH&query=%3Aprice-asc%3AallCategories%3Amonitors{price_buckets}&pageSize=100&currentPage={page}&lang=de&curr=CHF"
+        max_pages: 5
+        pagination:
+          type: "page_param"
+          param: "page"
+          start: 0
+        fields:
+          products: "products"
+          title: "name"
+          price: "price.value"
+          url: "url"
+          image: "images.0.url"
         currency: "CHF"

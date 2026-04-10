@@ -2,11 +2,10 @@ package pipeline
 
 import (
 	"bytes"
-	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
-	"regexp"
 	"strings"
 	"sync"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/trancee/DealScout/internal/currency"
 	"github.com/trancee/DealScout/internal/deal"
 	"github.com/trancee/DealScout/internal/fetcher"
+	"github.com/trancee/DealScout/internal/jsonpath"
 	"github.com/trancee/DealScout/internal/parser/cleaners"
 )
 
@@ -58,9 +58,22 @@ func processShop(shop config.Shop, f *fetcher.Fetcher, conv *currency.Converter,
 	)
 
 	shopClean := cleaners.ShopCleaner(shop.Cleaner)
+	urlClean := cleaners.URLCleaner(shop.Cleaner)
+
+	if shop.TokenEndpoint != nil {
+		token, err := fetchBearerToken(f, shop.TokenEndpoint)
+		if err != nil {
+			slog.Error("token fetch failed", "shop", shop.Name, "error", err)
+			return nil, nil, 0, 1
+		}
+		if shop.Headers == nil {
+			shop.Headers = make(map[string]string)
+		}
+		shop.Headers["Authorization"] = "Bearer " + token
+	}
 
 	for _, cat := range shop.Categories {
-		cat, priceReplacements := resolvePricePlaceholders(cat, eval.Rules())
+		cat, priceReplacements := resolvePricePlaceholders(cat, eval.Rules(), shop.PriceBuckets)
 		catFilter := buildFilter(cat.Category, filters)
 
 		for urlIdx, catURL := range categoryURLs(cat) {
@@ -85,6 +98,10 @@ func processShop(shop config.Shop, f *fetcher.Fetcher, conv *currency.Converter,
 
 				for _, p := range rawProducts {
 					products++
+
+					if urlClean != nil {
+						p.URL = urlClean(p.URL)
+					}
 
 					cleaned, priceCHF, oldPrice, skip := transformProduct(p, cat, shopClean, catFilter, conv)
 					if skip {
@@ -139,6 +156,23 @@ func buildFilter(category string, filters map[string]config.Filter) cleaners.Fil
 		return nil
 	}
 	return cleaners.NewFilter(f)
+}
+
+// fetchBearerToken calls a token endpoint and extracts a token string via a JSON path.
+func fetchBearerToken(f *fetcher.Fetcher, ep *config.TokenEndpoint) (string, error) {
+	data, err := f.Get(ep.URL)
+	if err != nil {
+		return "", fmt.Errorf("fetching token from %s: %w", ep.URL, err)
+	}
+	var raw interface{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return "", fmt.Errorf("parsing token response: %w", err)
+	}
+	token := jsonpath.String(raw, ep.TokenPath)
+	if token == "" {
+		return "", fmt.Errorf("token not found at path %q", ep.TokenPath)
+	}
+	return token, nil
 }
 
 func stripJSONP(data []byte, callback string) []byte {
@@ -203,32 +237,3 @@ func fetchBody(cat config.ShopCategory, page int, priceReplacements map[string]s
 	return body
 }
 
-var base64PlaceholderRe = regexp.MustCompile(`\{base64_start\}(.*?)\{base64_end\}`)
-
-func resolvePricePlaceholders(cat config.ShopCategory, rules map[string]config.DealRule) (config.ShopCategory, map[string]string) {
-	replacements := map[string]string{}
-	rule, ok := rules[cat.Category]
-	if !ok {
-		return cat, replacements
-	}
-
-	minPrice := fmt.Sprintf("%.0f", rule.MinPrice)
-	maxPrice := fmt.Sprintf("%.0f", rule.MaxPrice)
-
-	replacements["{min_price}"] = minPrice
-	replacements["{max_price}"] = maxPrice
-
-	r := strings.NewReplacer("{min_price}", minPrice, "{max_price}", maxPrice)
-	cat.URL = r.Replace(cat.URL)
-	for i := range cat.URLs {
-		cat.URLs[i] = r.Replace(cat.URLs[i])
-	}
-
-	// Resolve {base64_start}...{base64_end} — encode inner content as base64.
-	cat.URL = base64PlaceholderRe.ReplaceAllStringFunc(cat.URL, func(match string) string {
-		inner := match[len("{base64_start}") : len(match)-len("{base64_end}")]
-		return base64.StdEncoding.EncodeToString([]byte(inner))
-	})
-
-	return cat, replacements
-}

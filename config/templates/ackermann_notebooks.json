@@ -1,0 +1,19 @@
+{
+  "operationName": "AdditionalInfiniteCategoryProductGridData",
+  "query": "query AdditionalInfiniteCategoryProductGridData($params: SearchParametersInput!, $pathname: String!) { category(params: $params, pathname: $pathname) { __typename ... on CategoryResult { items { styleName brand { name } primaryVariationGroup { href image price { currentPrice discount { previousPrice } } } } summary { totalResultCount } } } }",
+  "variables": {
+    "params": {
+      "constraints": {
+        "appliedFilters": [
+          { "filterId": "filter_price", "values": ["{min_price}-{max_price}"] }
+        ]
+      },
+      "environment": { "channel": "DESKTOP", "isBot": false, "isMonitoring": false, "locale": "de-CH" },
+      "paging": { "limit": 72, "offset": {offset}, "sortBy": "price-asc" },
+      "tracking": { "sessionId": "1092:w:00000000-0000-0000-0000-000000000000", "userConsent": false },
+      "unifiedFilterHandling": true,
+      "version": "22"
+    },
+    "pathname": "/technik/multimedia/notebooks/"
+  }
+}

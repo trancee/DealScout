@@ -1,0 +1,39 @@
+{
+  "trackingId": "prod_conforama",
+  "clientId": "19ae7ad8-063a-43e0-9109-4690f85d044d",
+  "context": {
+    "view": {
+      "url": "https://www.conforama.ch/de/laptops/c/080502"
+    }
+  },
+  "language": "de",
+  "country": "CH",
+  "currency": "CHF",
+  "page": {offset},
+  "perPage": 100,
+  "facets": [
+    {
+      "facetId": "ec_promo_price",
+      "field": "ec_promo_price",
+      "type": "numericalRange",
+      "numberOfValues": 1,
+      "values": [
+        {
+          "state": "selected",
+          "start": {min_price},
+          "end": {max_price},
+          "endInclusive": true
+        }
+      ]
+    }
+  ],
+  "sort": {
+    "sortCriteria": "fields",
+    "fields": [
+      {
+        "field": "ec_price",
+        "direction": "asc"
+      }
+    ]
+  }
+}

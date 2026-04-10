@@ -31,17 +31,24 @@ func TestGalaxusShopCleaner(t *testing.T) {
 	}
 }
 
-func TestAmazonShopCleaner(t *testing.T) {
-	clean := cleaners.ShopCleaner("amazon")
+func TestUnknownShopCleanerReturnsNil(t *testing.T) {
+	if cleaners.ShopCleaner("unknown_shop") != nil {
+		t.Error("expected nil for unknown shop")
+	}
+}
+
+func TestAckermannURLCleaner(t *testing.T) {
+	clean := cleaners.URLCleaner("ackermann")
 	if clean == nil {
-		t.Fatal("ShopCleaner(amazon) returned nil")
+		t.Fatal("URLCleaner(ackermann) returned nil")
 	}
 
 	tests := []struct {
 		input, want string
 	}{
-		{"Samsung Galaxy A15, Android Smartphone, 6.5 Zoll, 128 GB Speicher", "Samsung Galaxy A15"},
-		{"Apple iPhone 16 Pro Max 256GB - Space Black", "Apple iPhone 16 Pro Max 256GB - Space Black"},
+		{"https://www.ackermann.ch/p/samsung-galaxy-a16?ref=search&tracking=abc", "https://www.ackermann.ch/p/samsung-galaxy-a16"},
+		{"https://www.ackermann.ch/p/apple-iphone-16", "https://www.ackermann.ch/p/apple-iphone-16"},
+		{"/p/some-product?foo=bar&baz=1", "/p/some-product"},
 	}
 
 	for _, tt := range tests {
@@ -54,8 +61,8 @@ func TestAmazonShopCleaner(t *testing.T) {
 	}
 }
 
-func TestUnknownShopCleanerReturnsNil(t *testing.T) {
-	if cleaners.ShopCleaner("unknown_shop") != nil {
+func TestUnknownURLCleanerReturnsNil(t *testing.T) {
+	if cleaners.URLCleaner("unknown_shop") != nil {
 		t.Error("expected nil for unknown shop")
 	}
 }
@@ -339,6 +346,63 @@ func TestOrderflowShopCleaner(t *testing.T) {
 		{"Motorola Mobility moto g15 128GB Dual SIM", "moto g15"},
 		{"Samsung Galaxy XCover 7 Enterprise Edition 128 GB", "Samsung Galaxy XCover 7 EE"},
 		{"Nokia 225 4G 128 MB Blau", "Nokia 225 128 MB Blau"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got := clean(tt.input)
+			if got != tt.want {
+				t.Errorf("got %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestConforamaShopCleaner(t *testing.T) {
+	clean := cleaners.ShopCleaner("conforama")
+	if clean == nil {
+		t.Fatal("ShopCleaner(conforama) returned nil")
+	}
+
+	tests := []struct {
+		input, want string
+	}{
+		// Duplicated brand prefix removal.
+		{"ZTE ZTE Blade A35 schwarz", "ZTE Blade A35 schwarz"},
+		{"HMD HMD ARC schwarz", "HMD ARC schwarz"},
+		{"REALME REALME NOTE 60 4+ schwarz", "REALME NOTE 60 4+ schwarz"},
+		// No duplicate — unchanged (colors stripped later by NormalizeName).
+		{"SAMSUNG Galaxy A16 schwarz", "SAMSUNG Galaxy A16 schwarz"},
+		{"KONROW Senior280Next schwarz", "KONROW Senior280Next schwarz"},
+		// Storage suffix stripping.
+		{"APPLE Iphone 14 128 GB schwarz", "APPLE Iphone 14"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got := clean(tt.input)
+			if got != tt.want {
+				t.Errorf("got %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPostShopCleaner(t *testing.T) {
+	clean := cleaners.ShopCleaner("postshop")
+	if clean == nil {
+		t.Fatal("ShopCleaner(postshop) returned nil")
+	}
+
+	tests := []struct {
+		input, want string
+	}{
+		{"SAMSUNG Galaxy A17 LTE 128GB Black", "SAMSUNG Galaxy A17"},
+		{"REALME NOTE 70T 4+128GB OBSIDAN BLACK", "REALME NOTE 70T"},
+		{"Samsung Galaxy A16 5G (Blue Black 128GB)", "Samsung Galaxy A16"},
+		{"Nokia 3210 4G (Gold)", "Nokia 3210"},
+		{"emporia SIMPLICITYglam.V227 LTE Black", "emporia SIMPLICITYglam.V227"},
+		{"HMD Barça 3210 Blue", "HMD Barça 3210 Blue"},
 	}
 
 	for _, tt := range tests {

@@ -44,6 +44,9 @@ func ParseJSON(data []byte, fields map[string]string) ([]RawProduct, error) {
 		if titlePrefix := jsonpath.String(item, fields["title_prefix"]); titlePrefix != "" && title != "" {
 			title = titlePrefix + " " + title
 		}
+		if titleSuffix := jsonpath.String(item, fields["title_suffix"]); titleSuffix != "" && title != "" {
+			title = title + " " + titleSuffix
+		}
 
 		var price float64
 		if fields["price"] != "" {

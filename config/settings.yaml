@@ -12,6 +12,6 @@ price_history_retention_days: 90
 default_max_pages: 5
 telegram_topics:
   smartphones: 2
-  laptops: 3
+  notebooks: 3
   headphones: 4
   monitors: 5

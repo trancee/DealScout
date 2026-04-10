@@ -106,7 +106,7 @@ DealScout/
 │   │       │   └── ...
 │   │       └── categories/            # Per-category normalization
 │   │           ├── smartphone.go
-│   │           ├── laptop.go
+│   │           ├── notebook.go
 │   │           └── headphones.go
 │   ├── deal/
 │   │   └── evaluator.go               # Deal rule engine + sanity bounds
@@ -128,7 +128,7 @@ DealScout/
 │   ├── secrets.yaml.example           # Reference template (committed)
 │   └── templates/                     # POST body templates for GraphQL/API shops
 │       ├── galaxus_smartphone.json
-│       ├── galaxus_laptop.json
+│       ├── galaxus_notebook.json
 │       └── ...
 ├── go.mod
 ├── go.sum
@@ -379,7 +379,7 @@ default_max_pages: 5
 # Telegram topics (secrets in secrets.yaml or env vars)
 telegram_topics:
   smartphone: 0          # message_thread_id (0 = General topic)
-  laptop: 0
+  notebook: 0
   headphones: 0
 ```
 
@@ -412,9 +412,9 @@ shops:
           image: "product.imageUrl"
         currency: "CHF"
 
-      - category: "laptops"
+      - category: "notebooks"
         url: "https://www.galaxus.ch/api/graphql/product-type-filter-products"
-        body_template: "templates/galaxus_laptop.json"
+        body_template: "templates/galaxus_notebook.json"
         max_pages: 3
         pagination:
           type: "offset"
@@ -459,7 +459,7 @@ smartphone:
   max_price: 350
   min_discount_pct: 10
 
-laptop:
+notebook:
   min_price: 400
   max_price: 1200
   min_discount_pct: 15
@@ -484,7 +484,7 @@ smartphone:
     # ... (full list ported from previous project)
   exclusion_regex: "(?i)Cover|Hülle|Armband|Ladegerät|Schutzfolie|SmartTag|Smartwatch"
 
-laptop:
+notebook:
   skip_brands: []
   exclusion_regex: "(?i)Tasche|Sleeve|Adapter"
 
@@ -542,7 +542,7 @@ A Telegram **supergroup with Forum Topics enabled**. Each product category maps 
 | Topic | Category |
 |---|---|
 | 📱 Smartphones | `smartphone` |
-| 💻 Laptops | `laptop` |
+| 💻 notebooks | `notebook` |
 | 🎧 Headphones | `headphones` |
 
 ### 7.2 Message Format
